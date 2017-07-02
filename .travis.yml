@@ -19,7 +19,7 @@ matrix:
             - ubuntu-toolchain-r-test
 
     - os: osx
-      osx_image: xcode8.2
+      osx_image: xcode9
 
 before_install:
   - mkdir -p ~/.local/bin
