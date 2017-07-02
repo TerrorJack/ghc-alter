@@ -1,0 +1,12 @@
+resolver: ghc-8.2.0.20170507
+setup-info:
+ ghc:
+  linux64:
+   8.2.0.20170507:
+    url: https://downloads.haskell.org/~ghc/8.2.1-rc2/ghc-8.2.0.20170507-x86_64-deb8-linux.tar.xz
+  macosx:
+   8.2.0.20170507:
+    url: https://downloads.haskell.org/~ghc/8.2.1-rc2/ghc-8.2.0.20170507-x86_64-apple-darwin.tar.xz
+  windows64:
+   8.2.0.20170507:
+    url: https://downloads.haskell.org/~ghc/8.2.1-rc2/ghc-8.2.0.20170507-x86_64-unknown-mingw32.tar.xz

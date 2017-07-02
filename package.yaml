@@ -1,0 +1,31 @@
+name: ghc-kit
+version: 0.0.1
+category: Compiler
+synopsis: Utilities for building Haskell tooling with ghc.
+stability: alpha
+maintainer: Shao Cheng <astrohavoc@gmail.com>
+copyright: (c) 2017 Shao Cheng
+license: BSD3
+github: TerrorJack/ghc-kit
+
+extra-source-files:
+  - LICENSE
+  - README.md
+  - CHANGELOG.md
+
+ghc-options: -Wall
+
+dependencies:
+  - base >= 4.9 && < 5
+  - binary
+  - Cabal
+  - template-haskell
+
+custom-setup:
+  dependencies:
+    - base
+    - binary
+    - Cabal
+
+library:
+  source-dirs: src
