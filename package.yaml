@@ -19,6 +19,7 @@ dependencies:
   - base >= 4.9 && < 5
   - binary
   - Cabal
+  - ghc
   - template-haskell
 
 custom-setup:
