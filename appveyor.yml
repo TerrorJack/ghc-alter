@@ -1,0 +1,14 @@
+shallow_clone: true
+
+cache:
+  - "%APPDATA%\\stack"
+  - "%APPVEYOR_BUILD_FOLDER%\\.stack-work"
+
+install:
+  - cinst haskell-stack
+
+before_build:
+  - stack --no-terminal --install-ghc build --only-dependencies
+
+build_script:
+  - stack --no-terminal install
