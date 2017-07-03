@@ -19,8 +19,12 @@ dependencies:
   - base >= 4.9 && < 5
   - binary
   - Cabal
+  - directory
+  - filepath
   - ghc
+  - process
   - template-haskell
+  - transformers
 
 custom-setup:
   dependencies:
