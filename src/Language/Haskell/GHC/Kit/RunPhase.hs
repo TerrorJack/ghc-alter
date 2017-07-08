@@ -32,10 +32,8 @@ data RunPhaseTask = RunPhaseTask
   { logRunPhase :: PhasePlus -> FilePath -> DynFlags -> IO ()
   , coreHook :: ModSummary -> CgGuts -> IO ()
   , corePrepHook :: ModSummary -> CoreProgram -> IO ()
-  , stgFromCoreHook :: ModSummary -> [StgTopBinding] -> IO ()
-  , stgHook :: ModSummary -> [StgTopBinding] -> IO ()
-  , cmmFromStgHook :: ModSummary -> Stream IO CmmGroup () -> IO ()
-  , cmmHook :: ModSummary -> Stream IO CmmGroup () -> IO ()
+  , stgFromCoreHook, stgHook :: ModSummary -> [StgTopBinding] -> IO ()
+  , cmmFromStgHook, cmmHook :: ModSummary -> Stream IO CmmGroup () -> IO ()
   , cmmRawHook :: ModSummary -> Stream IO RawCmmGroup () -> IO ()
   }
 

@@ -8,6 +8,9 @@ module Language.Haskell.GHC.Kit.Utils.Shell
   , proc
   , procRead
   , cd
+  , withCd
+  , rm
+  , mkdir
   ) where
 
 import Control.Monad.Fail
@@ -18,9 +21,9 @@ import System.Directory
 import System.FilePath
 import System.Process hiding (proc)
 
-newtype Shell a =
-  Shell (StateT CreateProcess IO a)
-  deriving (Functor, Applicative, Monad, MonadFail, MonadIO)
+newtype Shell a = Shell
+  { unShell :: StateT CreateProcess IO a
+  } deriving (Functor, Applicative, Monad, MonadFail, MonadIO)
 
 runShell :: Shell a -> IO a
 runShell (Shell sh) = evalStateT sh $ shell ""
@@ -56,3 +59,19 @@ cd p =
         p1 <- canonicalizePath $ p0 </> p
         pure p1
     put cp {cwd = Just p'}
+
+withCd :: FilePath -> Shell a -> Shell a
+withCd p (Shell m) =
+  Shell $ do
+    cp0 <- get
+    let p0 = cwd cp0
+    unShell $ cd p
+    r <- m
+    modify' $ \cp -> cp {cwd = p0}
+    pure r
+
+rm :: FilePath -> Shell ()
+rm p = proc "rm" ["-rf", p]
+
+mkdir :: FilePath -> Shell ()
+mkdir p = proc "mkdir" ["-p", p]
