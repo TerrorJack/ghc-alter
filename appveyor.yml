@@ -9,6 +9,7 @@ install:
 
 before_build:
   - stack setup > NUL
+  - stack exec pacman -- -S autoconf
   - stack --no-terminal build --only-dependencies
 
 build_script:
