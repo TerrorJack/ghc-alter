@@ -37,4 +37,16 @@ before_install:
 install: true
 
 script:
+  - cd boot-lib
+
+  - cd integer-gmp
+  - autoreconf -i
+  - cd ..
+
+  - cd base
+  - autoreconf -i
+  - cd ..
+
+  - cd ..
+  
   - stack --no-terminal test

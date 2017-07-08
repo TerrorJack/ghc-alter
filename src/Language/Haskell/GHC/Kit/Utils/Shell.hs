@@ -3,7 +3,6 @@
 module Language.Haskell.GHC.Kit.Utils.Shell
   ( Shell
   , runShell
-  , cmd
   , proc
   , cd
   , withCd
@@ -25,24 +24,6 @@ newtype Shell a = Shell
 
 runShell :: Shell a -> IO a
 runShell (Shell sh) = evalStateT sh $ shell ""
-
-cmd :: String -> Shell ()
-cmd c =
-  Shell $ do
-    cp <- get
-    liftIO $
-      withCreateProcess
-        cp
-        { cmdspec = ShellCommand c
-        , std_in = Inherit
-        , std_out = Inherit
-        , std_err = Inherit
-        } $ \_ _ _ h -> do
-        r <- waitForProcess h
-        case r of
-          ExitSuccess -> pure ()
-          ExitFailure c_ ->
-            fail $ "Call to " ++ show c ++ " failed with exit code " ++ show c_
 
 proc :: FilePath -> [String] -> Shell ()
 proc p args =

@@ -16,4 +16,15 @@ build_script:
   - stack --no-terminal build
 
 test_script:
+  - cd boot-lib
+
+  - cd integer-gmp
+  - stack exec bash -- -c "autoreconf -i"
+  - cd ..
+
+  - cd base
+  - stack exec bash -- -c "autoreconf -i"
+  - cd ..
+
+  - cd ..
   - stack --no-terminal test
