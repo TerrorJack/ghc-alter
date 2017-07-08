@@ -1,6 +1,14 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
-module Language.Haskell.GHC.Kit.Utils.Shell where
+module Language.Haskell.GHC.Kit.Utils.Shell
+  ( Shell
+  , runShell
+  , cmd
+  , cmdRead
+  , proc
+  , procRead
+  , cd
+  ) where
 
 import Control.Monad.Fail
 import Control.Monad.IO.Class
@@ -8,11 +16,11 @@ import Control.Monad.Trans.State.Strict
 import Data.Functor
 import System.Directory
 import System.FilePath
-import System.Process
+import System.Process hiding (proc)
 
-newtype Shell a = Shell
-  { unShell :: StateT CreateProcess IO a
-  } deriving (Functor, Applicative, Monad, MonadFail, MonadIO)
+newtype Shell a =
+  Shell (StateT CreateProcess IO a)
+  deriving (Functor, Applicative, Monad, MonadFail, MonadIO)
 
 runShell :: Shell a -> IO a
 runShell (Shell sh) = evalStateT sh $ shell ""
