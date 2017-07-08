@@ -29,6 +29,8 @@ data BootTask = BootTask
 boot :: BootTask -> Shell ()
 boot BootTask {..} = do
   bootLib $ BootLibTask (top </> "ghc-prim") ghc ghcOpts confOpts
+  withCd (top </> "integer-gmp") $ proc "autoreconf" ["-i"]
   bootLib $ BootLibTask (top </> "integer-gmp") ghc ghcOpts confOpts
+  withCd (top </> "base") $ proc "autoreconf" ["-i"]
   bootLib $
     BootLibTask (top </> "base") ghc ghcOpts ("-finteger-gmp" : confOpts)
