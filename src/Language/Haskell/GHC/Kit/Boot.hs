@@ -16,10 +16,10 @@ bootLib :: BootLibTask -> Shell ()
 bootLib BootLibTask {..} = do
   proc ghc [lib </> "Setup.hs"]
   withCd lib $ do
-    proc "./Setup" $
+    proc (lib </> "Setup") $
       ["configure", "--with-ghc=" ++ ghc] ++
       ["--ghc-options=" ++ opt | opt <- ghcOpts] ++ confOpts
-    proc "./Setup" ["build"]
+    proc (lib </> "Setup") ["build"]
 
 data BootTask = BootTask
   { top, ghc :: FilePath

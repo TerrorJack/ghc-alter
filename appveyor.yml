@@ -12,4 +12,7 @@ before_build:
   - stack --no-terminal build --only-dependencies
 
 build_script:
-  - stack --no-terminal install
+  - stack --no-terminal build
+
+test_script:
+  - stack --no-terminal test

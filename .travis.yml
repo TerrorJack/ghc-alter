@@ -37,4 +37,4 @@ before_install:
 install: true
 
 script:
-  - stack --no-terminal install
+  - stack --no-terminal test
