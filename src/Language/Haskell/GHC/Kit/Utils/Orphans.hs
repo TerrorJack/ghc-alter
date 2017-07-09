@@ -2,7 +2,7 @@
 {-# LANGUAGE StandaloneDeriving #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
-module Language.Haskell.GHC.Kit.Orphans where
+module Language.Haskell.GHC.Kit.Utils.Orphans where
 
 import CoreSyn
 import GHC.Generics
