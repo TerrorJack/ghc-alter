@@ -32,11 +32,13 @@ before_install:
     else
       travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
     fi
-  - stack --no-terminal --install-ghc build --only-dependencies
+  - stack --no-terminal --install-ghc build --test --no-run-tests --only-dependencies
 
 install: true
 
 script:
+  - stack --no-terminal install
+
   - cd boot-lib
 
   - cd integer-gmp
