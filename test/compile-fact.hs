@@ -10,4 +10,4 @@ main = do
   r <- readProcess "./fact" [] ""
   case r of
     "120\n" -> pure ()
-    _ -> fail "Result of fact 5 expected to be 120, got " ++ r
+    _ -> fail $ "Result of fact 5 expected to be 120, got " ++ r

@@ -13,6 +13,15 @@ extra-source-files:
   - README.md
   - CHANGELOG.md
 
+other-extensions:
+  - DeriveLift
+  - GeneralizedNewtypeDeriving
+  - NamedFieldPuns
+  - RecordWildCards
+  - StandaloneDeriving
+  - StrictData
+  - TemplateHaskell
+
 ghc-options: -Wall
 
 dependencies:
