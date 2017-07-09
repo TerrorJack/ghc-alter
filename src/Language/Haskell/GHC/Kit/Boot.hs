@@ -4,7 +4,9 @@
 
 module Language.Haskell.GHC.Kit.Boot where
 
+import qualified Language.Haskell.GHC.Kit.BuildInfo as P
 import Language.Haskell.GHC.Kit.Utils.Shell
+import System.Directory
 import System.FilePath
 
 data BootLibTask = BootLibTask
@@ -25,6 +27,11 @@ data BootTask = BootTask
   { top, ghc :: FilePath
   , ghcOpts, confOpts :: [String]
   }
+
+defaultBootTask :: IO BootTask
+defaultBootTask = do
+  pwd <- getCurrentDirectory
+  pure BootTask {top = pwd, ghc = P.ghc, ghcOpts = [], confOpts = []}
 
 boot :: BootTask -> Shell ()
 boot BootTask {..} = do

@@ -35,6 +35,13 @@ custom-setup:
 library:
   source-dirs: src
 
+executables:
+  ghc-wrapper:
+    source-dirs: app
+    main: ghc-wrapper.hs
+    dependencies:
+      - ghc-kit
+
 tests:
   ghc-kit-boot:
     source-dirs: test
