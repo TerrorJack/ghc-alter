@@ -17,9 +17,11 @@ extra-source-files:
   - test/FactFunc.hs
 
 other-extensions:
+  - DefaultSignatures
   - DeriveGeneric
   - DeriveLift
   - GeneralizedNewtypeDeriving
+  - MultiParamTypeClasses
   - NamedFieldPuns
   - RecordWildCards
   - StandaloneDeriving
