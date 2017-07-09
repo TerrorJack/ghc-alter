@@ -13,7 +13,11 @@ extra-source-files:
   - README.md
   - CHANGELOG.md
 
+  - test/fact.hs
+  - test/FactFunc.hs
+
 other-extensions:
+  - DeriveGeneric
   - DeriveLift
   - GeneralizedNewtypeDeriving
   - NamedFieldPuns
