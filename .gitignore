@@ -5,3 +5,6 @@ Setup
 Setup.hi
 Setup.o
 dist/
+*.hi
+*.o
+test/fact

@@ -48,3 +48,9 @@ tests:
     main: ghc-kit-boot.hs
     dependencies:
       - ghc-kit
+  
+  compile-fact:
+    source-dirs: test
+    main: compile-fact.hs
+    dependencies:
+      - ghc-kit
