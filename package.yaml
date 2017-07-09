@@ -20,6 +20,7 @@ other-extensions:
   - DefaultSignatures
   - DeriveGeneric
   - DeriveLift
+  - FlexibleInstances
   - GeneralizedNewtypeDeriving
   - MultiParamTypeClasses
   - NamedFieldPuns
@@ -27,6 +28,7 @@ other-extensions:
   - StandaloneDeriving
   - StrictData
   - TemplateHaskell
+  - TypeOperators
 
 ghc-options: -Wall
 
