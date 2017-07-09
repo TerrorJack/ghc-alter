@@ -20,7 +20,7 @@ defaultBootTask = do
 
 bootLib :: BootTask -> Shell ()
 bootLib BootTask {..} = do
-  proc ghc [top </> "Setup.hs"]
+  proc P.ghc [top </> "Setup.hs"]
   withCd top $ do
     proc (top </> "Setup") $
       ["configure", "--with-ghc=" ++ ghc] ++
