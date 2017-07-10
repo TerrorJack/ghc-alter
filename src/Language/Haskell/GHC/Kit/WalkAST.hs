@@ -13,6 +13,13 @@ import StgSyn
 import TyCon
 import Unique
 
+abstractDataType :: String -> DataType
+abstractDataType n = mkDataType n [abstractConstr n]
+
+abstractConstr :: String -> Constr
+abstractConstr n =
+  mkConstr (abstractDataType n) ("{abstract:" ++ n ++ "}") [] Prefix
+
 deriving instance Data occ => Data (GenStgArg occ)
 
 deriving instance Data Width
@@ -23,7 +30,10 @@ deriving instance Data PrimOp
 
 deriving instance Data PrimCall
 
-instance Data Unique
+instance Data Unique where
+  gunfold _ _ _ = undefined
+  toConstr _ = abstractConstr "Unique"
+  dataTypeOf _ = mkNoRepType "Unique"
 
 deriving instance Data CCallSpec
 
@@ -42,9 +52,15 @@ deriving instance
 
 deriving instance (Data UpdateFlag)
 
-instance Data StgBinderInfo
+instance Data StgBinderInfo where
+  gunfold _ _ _ = undefined
+  toConstr _ = abstractConstr "StgBinderInfo"
+  dataTypeOf _ = mkNoRepType "StgBinderInfo"
 
-instance Data CostCentreStack
+instance Data CostCentreStack where
+  gunfold _ _ _ = undefined
+  toConstr _ = abstractConstr "CostCentreStack"
+  dataTypeOf _ = mkNoRepType "CostCentreStack"
 
 deriving instance
          (Data bndr, Data occ) => Data (GenStgRhs bndr occ)
