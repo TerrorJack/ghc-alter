@@ -13,8 +13,8 @@ extra-source-files:
   - README.md
   - CHANGELOG.md
 
-  - test/fact.hs
-  - test/FactFunc.hs
+  - test/fact/fact.hs
+  - test/fact/FactFunc.hs
 
 other-extensions:
   - DefaultSignatures

@@ -5,7 +5,7 @@ import System.Process
 
 main :: IO ()
 main = do
-  setCurrentDirectory "./test"
+  setCurrentDirectory "./test/fact"
   callProcess "ghc-wrapper" ["fact.hs"]
   r <- readProcess "./fact" [] ""
   case r of
