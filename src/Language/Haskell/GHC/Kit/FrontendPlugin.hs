@@ -3,7 +3,9 @@
 
 module Language.Haskell.GHC.Kit.FrontendPlugin where
 
+import Control.Monad.IO.Class
 import Data.Functor
+import qualified Data.Set as Set
 import GHC
 import GhcPlugins
 import Hooks
@@ -14,13 +16,14 @@ coreAction :: ModSummary -> CgGuts -> IO ()
 coreAction ModSummary {..} CgGuts {..} = do
   putStrLn $ "Module: " ++ showSDocUnsafe (ppr ms_mod)
   let ns = extnames cg_binds
-  putStrLn $ "Names: " ++ showSDocUnsafe (ppr ns)
+  putStrLn $ "Names: " ++ show (Set.size ns)
 
 runPhaseTask :: RunPhaseTask
 runPhaseTask = defaultRunPhaseTask {coreHook = coreAction}
 
 frontendAction :: [String] -> [(String, Maybe Phase)] -> Ghc ()
-frontendAction _ targets = do
+frontendAction args targets = do
+  liftIO $ putStrLn $ "args: " ++ show args
   dflags <- getSessionDynFlags
   void $
     setSessionDynFlags
