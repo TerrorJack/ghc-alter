@@ -4,16 +4,18 @@ module Language.Haskell.GHC.Kit.WalkAST where
 
 import Data.Data hiding (TypeRep, typeOf, typeRep)
 import qualified Data.Set as Set
+import Name
 import Type.Reflection
 import Var
 
-rawvars :: Data t => t -> [Var]
-rawvars t = concat (gmapQ f t)
+extnames :: Data t => t -> Set.Set Name
+extnames t = Set.unions (gmapQ f t)
   where
     f st =
       case eqTypeRep (typeOf st) (typeRep :: TypeRep Var) of
-        Just HRefl -> [st]
-        _ -> rawvars st
-
-vars :: Data t => t -> Set.Set Var
-vars = Set.filter isGlobalId . Set.fromList . rawvars
+        Just HRefl ->
+          let n = getName st
+          in case nameModule_maybe n of
+               Just _ -> Set.singleton n
+               _ -> Set.empty
+        _ -> extnames st

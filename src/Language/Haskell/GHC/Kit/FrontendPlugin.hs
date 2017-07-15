@@ -13,8 +13,8 @@ import Language.Haskell.GHC.Kit.WalkAST
 coreAction :: ModSummary -> CgGuts -> IO ()
 coreAction ModSummary {..} CgGuts {..} = do
   putStrLn $ "Module: " ++ showSDocUnsafe (ppr ms_mod)
-  let vs = vars cg_binds
-  putStrLn $ "Vars: " ++ showSDocUnsafe (ppr vs)
+  let ns = extnames cg_binds
+  putStrLn $ "Names: " ++ showSDocUnsafe (ppr ns)
 
 runPhaseTask :: RunPhaseTask
 runPhaseTask = defaultRunPhaseTask {coreHook = coreAction}
