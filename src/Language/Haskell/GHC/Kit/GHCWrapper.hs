@@ -1,4 +1,5 @@
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE StrictData #-}
 
 module Language.Haskell.GHC.Kit.GHCWrapper where
 
@@ -7,15 +8,16 @@ import Language.Haskell.GHC.Kit.BuildInfo
 import System.Environment
 import System.Process
 
-newtype WrapperOptions = WrapperOptions
-  { pluginModule :: String
+data WrapperOptions = WrapperOptions
+  { pluginModule, pluginPackage :: String
   }
 
 subst :: WrapperOptions -> [String] -> [String]
 subst WrapperOptions {..} args = do
   arg <- args
   case arg of
-    "--make" -> ["--frontend", pluginModule] ++ pkgdb
+    "--make" ->
+      ["--frontend", pluginModule, "-plugin-package", pluginPackage] ++ pkgdb
     _ -> [arg]
   where
     pkgdb =

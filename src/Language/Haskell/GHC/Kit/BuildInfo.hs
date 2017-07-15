@@ -25,3 +25,6 @@ ghcLibdir = $(ghcLibdirQ)
 
 pkgDbStack :: PackageDBStack
 pkgDbStack = $(pkgDbStackQ)
+
+pkgName :: String
+pkgName = $(pkgNameQ)

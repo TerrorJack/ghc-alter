@@ -10,9 +10,10 @@ import Distribution.Simple
 import Distribution.Simple.InstallDirs
        (CopyDest(NoCopyDest), InstallDirs(..))
 import Distribution.Simple.LocalBuildInfo
-       (absoluteInstallDirs, withPackageDB, withPrograms)
+       (absoluteInstallDirs, localPkgDescr, withPackageDB, withPrograms)
 import Distribution.Simple.Program
 import Distribution.Simple.Setup
+import Distribution.Types.PackageDescription
 
 main :: IO ()
 main =
@@ -35,6 +36,7 @@ main =
               ghc
               ["--print-libdir"]
           dump "ghc-libdir" $ takeWhile (not . isSpace) ghcLibdir
-          encodeFile "pkgdbstack.buildinfo" $ withPackageDB lbi
+          dump "pkgdbstack" $ withPackageDB lbi
+          dump "pkgname" $ unPackageName $ pkgName $ package $ localPkgDescr lbi
           postConf simpleUserHooks _args flags pkg_descr lbi
     }

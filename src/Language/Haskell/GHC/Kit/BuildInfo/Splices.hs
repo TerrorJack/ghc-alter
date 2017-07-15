@@ -10,6 +10,7 @@ module Language.Haskell.GHC.Kit.BuildInfo.Splices
   , ghcPkgQ
   , ghcLibdirQ
   , pkgDbStackQ
+  , pkgNameQ
   ) where
 
 import Data.Binary
@@ -45,3 +46,6 @@ pkgDbStackQ :: Q Exp
 pkgDbStackQ = do
   pkgdb <- qRunIO $ decodeFile "pkgdbstack.buildinfo"
   lift (pkgdb :: PackageDBStack)
+
+pkgNameQ :: Q Exp
+pkgNameQ = dirQ "pkgname"
