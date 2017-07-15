@@ -4,9 +4,10 @@
 module Language.Haskell.GHC.Kit.Boot where
 
 import qualified Language.Haskell.GHC.Kit.BuildInfo as P
-import Language.Haskell.GHC.Kit.Utils.Shell
 import System.Directory
+import System.Environment
 import System.FilePath
+import System.Process
 
 data BootTask = BootTask
   { top, ghc :: FilePath
@@ -18,17 +19,19 @@ defaultBootTask = do
   pwd <- getCurrentDirectory
   pure BootTask {top = pwd, ghc = P.ghc, ghcOpts = [], confOpts = []}
 
-bootLib :: BootTask -> Shell ()
+bootLib :: BootTask -> IO ()
 bootLib BootTask {..} = do
-  proc P.ghc [top </> "Setup.hs"]
-  withCd top $ do
-    proc (top </> "Setup") $
+  callProcess P.ghc [top </> "Setup.hs"]
+  withCurrentDirectory top $ do
+    callProcess "./Setup" $
       ["configure", "--with-ghc=" ++ ghc] ++
       ["--ghc-options=" ++ opt | opt <- ghcOpts] ++ confOpts
-    proc (top </> "Setup") ["build"]
+    callProcess "./Setup" ["build"]
 
-boot :: BootTask -> Shell ()
+boot :: BootTask -> IO ()
 boot BootTask {..} = do
-  bootLib $ BootTask (top </> "ghc-prim") ghc ghcOpts confOpts
-  bootLib $ BootTask (top </> "integer-gmp") ghc ghcOpts confOpts
-  bootLib $ BootTask (top </> "base") ghc ghcOpts ("-finteger-gmp" : confOpts)
+  unsetEnv "GHC_PACKAGE_PATH"
+  withCurrentDirectory top $ do
+    bootLib $ BootTask "ghc-prim" ghc ghcOpts confOpts
+    bootLib $ BootTask "integer-gmp" ghc ghcOpts confOpts
+    bootLib $ BootTask "base" ghc ghcOpts ("-finteger-gmp" : confOpts)
