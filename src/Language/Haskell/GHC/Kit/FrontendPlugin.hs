@@ -14,11 +14,26 @@ import Language.Haskell.GHC.Kit.WalkAST
 coreAction :: ModSummary -> CgGuts -> IO ()
 coreAction ModSummary {..} CgGuts {..} = do
   putStrLn $ "Current Module: " ++ showSDocUnsafe (ppr ms_mod)
+  let bs = do
+        b <- cg_binds
+        case b of
+          NonRec v _ -> [v]
+          Rec bs' -> [v | (v, _) <- bs']
+  putStrLn $ "Top-level Binding Modules: " ++ showSDocUnsafe (ppr (extmods bs))
   let ms = extmods cg_binds
   putStrLn $ "Dependent Modules: " ++ showSDocUnsafe (ppr ms)
 
 runPhaseTask :: RunPhaseTask
-runPhaseTask = defaultRunPhaseTask {coreHook = coreAction}
+runPhaseTask =
+  defaultRunPhaseTask
+  { coreHook = coreAction
+  , corePrepHook = \_ _ -> putStrLn "corePrep"
+  , stgFromCoreHook = \_ _ -> putStrLn "stgFromCore"
+  , stgHook = \_ _ -> putStrLn "stg"
+  , cmmFromStgHook = \_ _ -> putStrLn "cmmFromStg"
+  , cmmHook = \_ _ -> putStrLn "cmm"
+  , cmmRawHook = \_ _ -> putStrLn "cmmRaw"
+  }
 
 frontendAction :: [String] -> [(String, Maybe Phase)] -> Ghc ()
 frontendAction args targets = do
