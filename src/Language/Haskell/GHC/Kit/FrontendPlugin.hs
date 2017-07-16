@@ -26,7 +26,12 @@ coreAction ModSummary {..} CgGuts {..} = do
 runPhaseTask :: RunPhaseTask
 runPhaseTask =
   defaultRunPhaseTask
-  { coreHook = coreAction
+  { logRunPhase =
+      \phase_plus input_fn _ ->
+        putStrLn $
+        "runPhase " ++
+        showSDocUnsafe (ppr phase_plus) ++ ", input filename: " ++ show input_fn
+  , coreHook = coreAction
   , corePrepHook = \_ _ -> putStrLn "corePrep"
   , stgFromCoreHook = \_ _ -> putStrLn "stgFromCore"
   , stgHook = \_ _ -> putStrLn "stg"

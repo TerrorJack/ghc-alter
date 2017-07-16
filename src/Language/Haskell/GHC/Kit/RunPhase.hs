@@ -58,6 +58,16 @@ runPhaseWithTask ::
   -> CompPipeline (PhasePlus, FilePath)
 runPhaseWithTask RunPhaseTask {..} phase_plus input_fn dflags' = do
   liftIO $ logRunPhase phase_plus input_fn dflags'
+  runPhase phase_plus input_fn dflags'
+{-
+runPhaseWithTask ::
+     RunPhaseTask
+  -> PhasePlus
+  -> FilePath
+  -> DynFlags
+  -> CompPipeline (PhasePlus, FilePath)
+runPhaseWithTask RunPhaseTask {..} phase_plus input_fn dflags' = do
+  liftIO $ logRunPhase phase_plus input_fn dflags'
   case phase_plus of
     HscOut src_flavour _ (HscRecomp cgguts@CgGuts {..} mod_summary) -> do
       liftIO $ coreHook mod_summary cgguts
@@ -158,3 +168,4 @@ runPhaseWithTask RunPhaseTask {..} phase_plus input_fn dflags' = do
               rawcmms1
       runPhase phase_plus input_fn dflags'
     _ -> runPhase phase_plus input_fn dflags'
+-}
