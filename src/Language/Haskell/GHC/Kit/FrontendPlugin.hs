@@ -5,7 +5,6 @@ module Language.Haskell.GHC.Kit.FrontendPlugin where
 
 import Control.Monad.IO.Class
 import Data.Functor
-import qualified Data.Set as Set
 import GHC
 import GhcPlugins
 import Hooks
@@ -14,9 +13,9 @@ import Language.Haskell.GHC.Kit.WalkAST
 
 coreAction :: ModSummary -> CgGuts -> IO ()
 coreAction ModSummary {..} CgGuts {..} = do
-  putStrLn $ "Module: " ++ showSDocUnsafe (ppr ms_mod)
-  let ns = extnames cg_binds
-  putStrLn $ "Names: " ++ show (Set.size ns)
+  putStrLn $ "Current Module: " ++ showSDocUnsafe (ppr ms_mod)
+  let ms = extmods cg_binds
+  putStrLn $ "Dependent Modules: " ++ showSDocUnsafe (ppr ms)
 
 runPhaseTask :: RunPhaseTask
 runPhaseTask = defaultRunPhaseTask {coreHook = coreAction}
