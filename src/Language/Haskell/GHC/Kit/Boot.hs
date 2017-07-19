@@ -1,7 +1,12 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE StrictData #-}
 
-module Language.Haskell.GHC.Kit.Boot where
+module Language.Haskell.GHC.Kit.Boot
+  ( BootTask(..)
+  , defaultBootTask
+  , bootLib
+  , boot
+  ) where
 
 import qualified Language.Haskell.GHC.Kit.BuildInfo as P
 import System.Directory

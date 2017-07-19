@@ -1,7 +1,10 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE StrictData #-}
 
-module Language.Haskell.GHC.Kit.GHCWrapper where
+module Language.Haskell.GHC.Kit.GHCWrapper
+  ( WrapperOptions(..)
+  , wrapperMain
+  ) where
 
 import Distribution.Simple.Compiler
 import Language.Haskell.GHC.Kit.BuildInfo

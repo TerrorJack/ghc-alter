@@ -1,6 +1,8 @@
 {-# LANGUAGE GADTs #-}
 
-module Language.Haskell.GHC.Kit.WalkAST where
+module Language.Haskell.GHC.Kit.WalkAST
+  ( extmods
+  ) where
 
 import Data.Data hiding (TypeRep, typeOf, typeRep)
 import qualified Data.Set as Set

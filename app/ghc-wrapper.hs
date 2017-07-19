@@ -1,4 +1,6 @@
-module Main where
+module Main
+  ( main
+  ) where
 
 import Language.Haskell.GHC.Kit.BuildInfo
 import Language.Haskell.GHC.Kit.GHCWrapper

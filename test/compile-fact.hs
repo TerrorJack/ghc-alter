@@ -1,4 +1,6 @@
-module Main where
+module Main
+  ( main
+  ) where
 
 import System.Directory
 import System.Process

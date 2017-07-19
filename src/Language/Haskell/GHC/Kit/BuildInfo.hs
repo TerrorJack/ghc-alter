@@ -1,6 +1,15 @@
 {-# LANGUAGE TemplateHaskell #-}
 
-module Language.Haskell.GHC.Kit.BuildInfo where
+module Language.Haskell.GHC.Kit.BuildInfo
+  ( bindir
+  , libdir
+  , datadir
+  , ghc
+  , ghcPkg
+  , ghcLibdir
+  , pkgDbStack
+  , pkgName
+  ) where
 
 import Distribution.Simple.Compiler
 import Language.Haskell.GHC.Kit.BuildInfo.Splices

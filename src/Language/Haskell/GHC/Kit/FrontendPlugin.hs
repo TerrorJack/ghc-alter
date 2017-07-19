@@ -1,7 +1,9 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE StrictData #-}
 
-module Language.Haskell.GHC.Kit.FrontendPlugin where
+module Language.Haskell.GHC.Kit.FrontendPlugin
+  ( frontendPlugin
+  ) where
 
 import Control.Monad.IO.Class
 import Data.Functor
@@ -23,21 +25,21 @@ coreAction ModSummary {..} CgGuts {..} = do
   let ms = extmods cg_binds
   putStrLn $ "Dependent Modules: " ++ showSDocUnsafe (ppr ms)
 
-runPhaseTask :: RunPhaseTask
-runPhaseTask =
-  defaultRunPhaseTask
-  { logRunPhase =
+runPhaseOpts :: RunPhase
+runPhaseOpts =
+  defaultRunPhase
+  { onenter =
       \phase_plus input_fn _ ->
         putStrLn $
         "runPhase " ++
         showSDocUnsafe (ppr phase_plus) ++ ", input filename: " ++ show input_fn
-  , coreHook = coreAction
-  , corePrepHook = \_ _ -> putStrLn "corePrep"
-  , stgFromCoreHook = \_ _ -> putStrLn "stgFromCore"
-  , stgHook = \_ _ -> putStrLn "stg"
-  , cmmFromStgHook = \_ _ -> putStrLn "cmmFromStg"
-  , cmmHook = \_ _ -> putStrLn "cmm"
-  , cmmRawHook = \_ _ -> putStrLn "cmmRaw"
+  , core = coreAction
+  , corePrep = \_ _ -> putStrLn "corePrep"
+  , stgFromCore = \_ _ -> putStrLn "stgFromCore"
+  , stg = \_ _ -> putStrLn "stg"
+  , cmmFromStg = \_ _ -> putStrLn "cmmFromStg"
+  , cmm = \_ _ -> putStrLn "cmm"
+  , cmmRaw = \_ _ -> putStrLn "cmmRaw"
   }
 
 frontendAction :: [String] -> [(String, Maybe Phase)] -> Ghc ()
@@ -48,7 +50,7 @@ frontendAction args targets = do
     setSessionDynFlags
       dflags
       { ghcMode = CompManager
-      , hooks = emptyHooks {runPhaseHook = Just $ runPhaseWithTask runPhaseTask}
+      , hooks = emptyHooks {runPhaseHook = Just $ runPhaseWith runPhaseOpts}
       }
   sequenceA [guessTarget t f | (t, f) <- targets] >>= setTargets
   sf <- load LoadAllTargets

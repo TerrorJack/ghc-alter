@@ -17,18 +17,13 @@ extra-source-files:
   - test/fact/FactFunc.hs
 
 other-extensions:
-  - DefaultSignatures
-  - DeriveGeneric
   - DeriveLift
-  - FlexibleInstances
-  - GeneralizedNewtypeDeriving
-  - MultiParamTypeClasses
+  - GADTs
   - NamedFieldPuns
   - RecordWildCards
   - StandaloneDeriving
   - StrictData
   - TemplateHaskell
-  - TypeOperators
 
 ghc-options: -Wall
 
