@@ -8,4 +8,4 @@ import System.FilePath
 main :: IO ()
 main = do
   t <- defaultBootTask
-  boot $ t {top = top t </> "boot-lib", ghc = "ghc-wrapper"}
+  boot $ t {ghc = "ghc-wrapper"}
