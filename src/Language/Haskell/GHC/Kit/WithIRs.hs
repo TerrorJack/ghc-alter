@@ -23,14 +23,14 @@ data IR = IR
 
 toRunPhase :: (ModSummary -> IR -> IO ()) -> IO RP.RunPhase
 toRunPhase cont = do
-  mod_summary_ref <- newIORef undefined
-  core_ref <- newIORef undefined
-  corePrep_ref <- newIORef undefined
-  stgFromCore_ref <- newIORef undefined
-  stg_ref <- newIORef undefined
-  cmmFromStg_ref <- newIORef undefined
-  cmm_ref <- newIORef undefined
-  cmmRaw_ref <- newIORef undefined
+  mod_summary_ref <- new_ref
+  core_ref <- new_ref
+  corePrep_ref <- new_ref
+  stgFromCore_ref <- new_ref
+  stg_ref <- new_ref
+  cmmFromStg_ref <- new_ref
+  cmm_ref <- new_ref
+  cmmRaw_ref <- new_ref
   pure
     RP.defaultRunPhase
     { RP.core =
@@ -55,4 +55,5 @@ toRunPhase cont = do
           cont mod_summary ir
     }
   where
+    new_ref = newIORef undefined
     fill_ref ref _ = writeIORef ref

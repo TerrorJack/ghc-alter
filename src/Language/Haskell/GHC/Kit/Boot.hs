@@ -54,11 +54,11 @@ bootLib BootTask {..} = do
     callProcess
       "./Setup"
       ["install", "--builddir=" ++ (topdir </> "dist" </> bootlibdir)]
-    when (bootlibdir == "ghc-prim") $
+    when (bootlibdir == "ghc-prim") $ do
       callCommand $
-      "sed -i -e 's,^exposed-modules:,exposed-modules: GHC.Prim,' " ++
-      (pkgDb </> "ghc-prim-*.conf")
-    callProcess ghcPkg ["--package-db", pkgDb, "recache"]
+        "sed -i -e 's,^exposed-modules:,exposed-modules: GHC.Prim,' " ++
+        (pkgDb </> "ghc-prim-*.conf")
+      callProcess ghcPkg ["--package-db", pkgDb, "recache"]
 
 boot :: BootTask -> IO ()
 boot bt@BootTask {..} = do
