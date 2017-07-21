@@ -1,4 +1,3 @@
-{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE StrictData #-}
 
 module Language.Haskell.GHC.Kit.WithIRs
@@ -7,10 +6,13 @@ module Language.Haskell.GHC.Kit.WithIRs
   ) where
 
 import Cmm
+import Control.Monad
 import CoreSyn
-import Data.IORef
+import DriverPipeline
+import GHC.Conc
 import HscTypes
 import qualified Language.Haskell.GHC.Kit.RunPhase as RP
+import Module
 import StgSyn
 import qualified Stream
 
@@ -22,57 +24,55 @@ data IR = IR
   , cmmRaw :: Stream.Stream IO RawCmmGroup ()
   }
 
-data HookFlag
-  = Unentered
-  | Entered
-  | Invoked
-
 toRunPhase :: (ModSummary -> IR -> IO ()) -> IO RP.RunPhase
 toRunPhase cont = do
-  flag_ref <- newIORef Unentered
-  mod_summary_ref <- new_ref
-  core_ref <- new_ref
-  corePrep_ref <- new_ref
-  stgFromCore_ref <- new_ref
-  stg_ref <- new_ref
-  cmmFromStg_ref <- new_ref
-  cmm_ref <- new_ref
-  cmmRaw_ref <- new_ref
+  flag_map_ref <- newTVarIO emptyModuleEnv
+  core_map_ref <- newTVarIO emptyModuleEnv
+  corePrep_map_ref <- newTVarIO emptyModuleEnv
+  stgFromCore_map_ref <- newTVarIO emptyModuleEnv
+  stg_map_ref <- newTVarIO emptyModuleEnv
+  cmmFromStg_map_ref <- newTVarIO emptyModuleEnv
+  cmm_map_ref <- newTVarIO emptyModuleEnv
+  cmmRaw_map_ref <- newTVarIO emptyModuleEnv
   pure
     RP.defaultRunPhase
-    { RP.core =
-        \mod_summary cgguts -> do
-          modifyIORef'
-            flag_ref
-            (\case
-               Unentered -> Entered
-               Entered -> error "Impossible happened in toRunPhase"
-               Invoked -> Invoked)
-          writeIORef mod_summary_ref mod_summary
-          writeIORef core_ref cgguts
-    , RP.corePrep = fill_ref corePrep_ref
-    , RP.stgFromCore = fill_ref stgFromCore_ref
-    , RP.stg = fill_ref stg_ref
-    , RP.cmmFromStg = fill_ref cmmFromStg_ref
-    , RP.cmm = fill_ref cmm_ref
-    , RP.cmmRaw = fill_ref cmmRaw_ref
-    , RP.onleave =
-        \_ _ _ -> do
-          flag <- readIORef flag_ref
-          case flag of
-            Entered -> do
-              mod_summary <- readIORef mod_summary_ref
-              ir <-
-                IR <$> readIORef core_ref <*> readIORef corePrep_ref <*>
-                readIORef stgFromCore_ref <*>
-                readIORef stg_ref <*>
-                readIORef cmmFromStg_ref <*>
-                readIORef cmm_ref <*>
-                readIORef cmmRaw_ref
-              cont mod_summary ir
-              writeIORef flag_ref Invoked
+    { RP.onleave =
+        \phase_plus _ _ ->
+          case phase_plus of
+            HscOut _ _ (HscRecomp _ mod_summary) ->
+              let key = ms_mod mod_summary
+                  read_map ref = do
+                    m <- readTVar ref
+                    case lookupModuleEnv m key of
+                      Just v -> pure v
+                      _ -> fail "Impossible happened in toRunPhase"
+              in join $
+                 atomically $ do
+                   flag_map <- readTVar flag_map_ref
+                   if key `elemModuleEnv` flag_map
+                     then pure $ pure ()
+                     else do
+                       writeTVar flag_map_ref $ extendModuleEnv flag_map key ()
+                       ir <-
+                         IR <$> read_map core_map_ref <*>
+                         read_map corePrep_map_ref <*>
+                         read_map stgFromCore_map_ref <*>
+                         read_map stg_map_ref <*>
+                         read_map cmmFromStg_map_ref <*>
+                         read_map cmm_map_ref <*>
+                         read_map cmmRaw_map_ref
+                       pure $ cont mod_summary ir
             _ -> pure ()
+    , RP.core = write_map core_map_ref
+    , RP.corePrep = write_map corePrep_map_ref
+    , RP.stgFromCore = write_map stgFromCore_map_ref
+    , RP.stg = write_map stg_map_ref
+    , RP.cmmFromStg = write_map cmmFromStg_map_ref
+    , RP.cmm = write_map cmm_map_ref
+    , RP.cmmRaw = write_map cmmRaw_map_ref
     }
   where
-    new_ref = newIORef undefined
-    fill_ref ref _ = writeIORef ref
+    write_map ref mod_summary x =
+      atomically $ do
+        m <- readTVar ref
+        writeTVar ref $ extendModuleEnv m (ms_mod mod_summary) x
