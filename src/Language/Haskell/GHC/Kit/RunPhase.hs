@@ -44,7 +44,7 @@ import TyCon
 import UniqSupply
 
 data RunPhase = RunPhase
-  { onenter :: PhasePlus -> FilePath -> DynFlags -> IO ()
+  { onenter, onleave :: PhasePlus -> FilePath -> DynFlags -> IO ()
   , core :: ModSummary -> CgGuts -> IO ()
   , corePrep :: ModSummary -> CoreProgram -> IO ()
   , stgFromCore, stg :: ModSummary -> [StgTopBinding] -> IO ()
@@ -56,6 +56,7 @@ defaultRunPhase :: RunPhase
 defaultRunPhase =
   RunPhase
   { onenter = three
+  , onleave = three
   , core = two
   , corePrep = two
   , stgFromCore = two
@@ -348,20 +349,23 @@ runPhaseWith ::
   -> CompPipeline (PhasePlus, FilePath)
 runPhaseWith rp@RunPhase {..} phase_plus input_fn dflags = do
   liftIO $ onenter phase_plus input_fn dflags
-  case phase_plus of
-    HscOut src_flavour mod_name (HscRecomp cgguts mod_summary) -> do
-      liftIO $ core mod_summary cgguts
-      location <- getLocation src_flavour mod_name
-      setModLocation location
-      let hsc_lang = hscTarget dflags
-          next_phase = hscPostBackendPhase dflags src_flavour hsc_lang
-      output_fn <- phaseOutputFilename next_phase
-      PipeState {hsc_env = hsc_env'} <- getPipeState
-      (outputFilename, mStub, foreign_files) <-
-        liftIO $ hscGenHardCodeWith rp hsc_env' cgguts mod_summary output_fn
-      stub_o <- liftIO (mapM (compileStub hsc_env') mStub)
-      foreign_os <-
-        liftIO $ mapM (uncurry (compileForeign hsc_env')) foreign_files
-      setForeignOs (maybe [] return stub_o ++ foreign_os)
-      return (RealPhase next_phase, outputFilename)
-    _ -> runPhase phase_plus input_fn dflags
+  r <-
+    case phase_plus of
+      HscOut src_flavour mod_name (HscRecomp cgguts mod_summary) -> do
+        liftIO $ core mod_summary cgguts
+        location <- getLocation src_flavour mod_name
+        setModLocation location
+        let hsc_lang = hscTarget dflags
+            next_phase = hscPostBackendPhase dflags src_flavour hsc_lang
+        output_fn <- phaseOutputFilename next_phase
+        PipeState {hsc_env = hsc_env'} <- getPipeState
+        (outputFilename, mStub, foreign_files) <-
+          liftIO $ hscGenHardCodeWith rp hsc_env' cgguts mod_summary output_fn
+        stub_o <- liftIO (mapM (compileStub hsc_env') mStub)
+        foreign_os <-
+          liftIO $ mapM (uncurry (compileForeign hsc_env')) foreign_files
+        setForeignOs (maybe [] return stub_o ++ foreign_os)
+        return (RealPhase next_phase, outputFilename)
+      _ -> runPhase phase_plus input_fn dflags
+  liftIO $ onleave phase_plus input_fn dflags
+  pure r
