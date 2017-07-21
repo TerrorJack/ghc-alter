@@ -8,4 +8,4 @@ import System.FilePath
 main :: IO ()
 main = do
   t <- defaultBootTask
-  boot $ t {ghc = "ghc-wrapper"}
+  boot $ t {ghc = "ghc-wrapper", confOpts = ["--verbose"]}
