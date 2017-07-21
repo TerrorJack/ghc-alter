@@ -26,7 +26,7 @@ data IR = IR
 
 toRunPhase :: (ModSummary -> IR -> IO ()) -> IO RP.RunPhase
 toRunPhase cont = do
-  flag_map_ref <- newTVarIO emptyModuleEnv
+  flag_set_ref <- newTVarIO emptyModuleSet
   core_map_ref <- newTVarIO emptyModuleEnv
   corePrep_map_ref <- newTVarIO emptyModuleEnv
   stgFromCore_map_ref <- newTVarIO emptyModuleEnv
@@ -48,11 +48,11 @@ toRunPhase cont = do
                       _ -> fail "Impossible happened in toRunPhase"
               in join $
                  atomically $ do
-                   flag_map <- readTVar flag_map_ref
-                   if key `elemModuleEnv` flag_map
+                   flag_set <- readTVar flag_set_ref
+                   if key `elemModuleSet` flag_set
                      then pure $ pure ()
                      else do
-                       writeTVar flag_map_ref $ extendModuleEnv flag_map key ()
+                       writeTVar flag_set_ref $ extendModuleSet flag_set key
                        ir <-
                          IR <$> read_map core_map_ref <*>
                          read_map corePrep_map_ref <*>
