@@ -14,8 +14,6 @@ import Language.Haskell.GHC.Kit.CompileTo
 import Language.Haskell.GHC.Kit.RunPhase (runPhaseWith)
 import Language.Haskell.GHC.Kit.WalkAST
 import Language.Haskell.GHC.Kit.WithIRs
-import System.Directory
-import System.FilePath
 
 coreAction :: ModSummary -> IR -> IO ()
 coreAction ModSummary {..} IR {core = CgGuts {..}} = do
@@ -32,16 +30,8 @@ coreAction ModSummary {..} IR {core = CgGuts {..}} = do
 frontendAction :: [String] -> [(String, Maybe Phase)] -> Ghc ()
 frontendAction args targets = do
   liftIO $ putStrLn $ "args: " ++ show args
-  pwd <- liftIO getCurrentDirectory
-  db <-
-    liftIO $
-    newCompilerStore $ CompilerConfig $ pwd </> ".boot" </> "compile-to"
-  finale <-
-    liftIO $
-    compileTo db $
-    Compiler $ \mod_summary ir -> do
-      coreAction mod_summary ir
-      pure "233"
+  db <- liftIO $ newCompilerStore $ CompilerConfig ".boot/compile-to"
+  finale <- liftIO $ compileTo db (Compiler coreAction)
   rp <- liftIO $ toRunPhase finale
   dflags <- getSessionDynFlags
   void $
