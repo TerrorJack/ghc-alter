@@ -32,4 +32,7 @@ subst WrapperOptions {..} args = do
 wrapperMain :: WrapperOptions -> IO ()
 wrapperMain opts = do
   args <- getArgs
+  let args' = subst opts args
+  putStrLn $ "Original ghc args: " ++ show args
+  putStrLn $ "Substituted ghc args: " ++ show args'
   callProcess ghc $ subst opts args
