@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE StrictData #-}
 
 module Language.Haskell.GHC.Kit.WithIRs
@@ -6,7 +7,6 @@ module Language.Haskell.GHC.Kit.WithIRs
   ) where
 
 import Cmm
-import Control.Monad
 import CoreSyn
 import Data.IORef
 import HscTypes
@@ -22,9 +22,14 @@ data IR = IR
   , cmmRaw :: Stream.Stream IO RawCmmGroup ()
   }
 
+data HookFlag
+  = Unentered
+  | Entered
+  | Invoked
+
 toRunPhase :: (ModSummary -> IR -> IO ()) -> IO RP.RunPhase
 toRunPhase cont = do
-  flag_ref <- newIORef False
+  flag_ref <- newIORef Unentered
   mod_summary_ref <- new_ref
   core_ref <- new_ref
   corePrep_ref <- new_ref
@@ -37,7 +42,12 @@ toRunPhase cont = do
     RP.defaultRunPhase
     { RP.core =
         \mod_summary cgguts -> do
-          writeIORef flag_ref True
+          modifyIORef'
+            flag_ref
+            (\case
+               Unentered -> Entered
+               Entered -> error "Impossible happened in toRunPhase"
+               Invoked -> Invoked)
           writeIORef mod_summary_ref mod_summary
           writeIORef core_ref cgguts
     , RP.corePrep = fill_ref corePrep_ref
@@ -49,17 +59,19 @@ toRunPhase cont = do
     , RP.onleave =
         \_ _ _ -> do
           flag <- readIORef flag_ref
-          when flag $ do
-            writeIORef flag_ref False
-            mod_summary <- readIORef mod_summary_ref
-            ir <-
-              IR <$> readIORef core_ref <*> readIORef corePrep_ref <*>
-              readIORef stgFromCore_ref <*>
-              readIORef stg_ref <*>
-              readIORef cmmFromStg_ref <*>
-              readIORef cmm_ref <*>
-              readIORef cmmRaw_ref
-            cont mod_summary ir
+          case flag of
+            Entered -> do
+              mod_summary <- readIORef mod_summary_ref
+              ir <-
+                IR <$> readIORef core_ref <*> readIORef corePrep_ref <*>
+                readIORef stgFromCore_ref <*>
+                readIORef stg_ref <*>
+                readIORef cmmFromStg_ref <*>
+                readIORef cmm_ref <*>
+                readIORef cmmRaw_ref
+              cont mod_summary ir
+              writeIORef flag_ref Invoked
+            _ -> pure ()
     }
   where
     new_ref = newIORef undefined
