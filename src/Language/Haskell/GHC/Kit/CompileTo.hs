@@ -1,3 +1,4 @@
+{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE StrictData #-}
 
 module Language.Haskell.GHC.Kit.CompileTo
@@ -8,9 +9,14 @@ module Language.Haskell.GHC.Kit.CompileTo
   , compileTo
   ) where
 
+import Data.Binary
+import DynFlags
 import HscTypes
 import Language.Haskell.GHC.Kit.WithIRs
 import Module
+import Outputable
+import System.Directory
+import System.FilePath
 
 newtype CompilerConfig a = CompilerConfig
   { topdir :: FilePath
@@ -21,12 +27,24 @@ data CompilerStore a = CompilerStore
   , modulePut :: Module -> a -> IO ()
   }
 
-newCompilerStore :: CompilerConfig a -> IO (CompilerStore a)
-newCompilerStore = undefined
+moduleKey :: Module -> FilePath
+moduleKey = showSDocOneLine unsafeGlobalDynFlags . pprModule
+
+newCompilerStore :: Binary a => CompilerConfig a -> IO (CompilerStore a)
+newCompilerStore CompilerConfig {..} = do
+  createDirectoryIfMissing True topdir
+  pure
+    CompilerStore {moduleGet = decodeFile . tofn, modulePut = encodeFile . tofn}
+  where
+    tofn = (topdir </>) . moduleKey
 
 newtype Compiler a = Compiler
   { runCompiler :: ModSummary -> IR -> IO a
   }
 
-compileTo :: CompilerStore a -> Compiler a -> IO (ModSummary -> IR -> IO ())
-compileTo = undefined
+compileTo ::
+     Binary a => CompilerStore a -> Compiler a -> IO (ModSummary -> IR -> IO ())
+compileTo CompilerStore {..} Compiler {..} =
+  pure $ \mod_summary ir -> do
+    r <- runCompiler mod_summary ir
+    modulePut (ms_mod mod_summary) r
