@@ -10,6 +10,7 @@ import Data.Functor
 import GHC
 import GhcPlugins
 import Hooks
+import Language.Haskell.GHC.Kit.CompileTo
 import Language.Haskell.GHC.Kit.RunPhase (runPhaseWith)
 import Language.Haskell.GHC.Kit.WalkAST
 import Language.Haskell.GHC.Kit.WithIRs
@@ -29,8 +30,10 @@ coreAction ModSummary {..} IR {core = CgGuts {..}} = do
 frontendAction :: [String] -> [(String, Maybe Phase)] -> Ghc ()
 frontendAction args targets = do
   liftIO $ putStrLn $ "args: " ++ show args
+  db <- liftIO $ newCompilerStore $ CompilerConfig "."
+  finale <- liftIO $ compileTo db (Compiler coreAction)
+  rp <- liftIO $ toRunPhase finale
   dflags <- getSessionDynFlags
-  rp <- liftIO $ toRunPhase coreAction
   void $
     setSessionDynFlags
       dflags

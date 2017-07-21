@@ -52,3 +52,5 @@ script:
   - cd ..
   
   - stack --no-terminal test
+
+  - ls -R .boot/
