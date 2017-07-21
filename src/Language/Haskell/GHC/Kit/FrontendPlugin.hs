@@ -30,7 +30,7 @@ coreAction ModSummary {..} IR {core = CgGuts {..}} = do
 frontendAction :: [String] -> [(String, Maybe Phase)] -> Ghc ()
 frontendAction args targets = do
   liftIO $ putStrLn $ "args: " ++ show args
-  db <- liftIO $ newCompilerStore $ CompilerConfig ".boot/compile-to"
+  db <- liftIO $ newCompilerStore $ CompilerConfig "../../.boot/compile-to"
   finale <- liftIO $ compileTo db (Compiler coreAction)
   rp <- liftIO $ toRunPhase finale
   dflags <- getSessionDynFlags

@@ -10,11 +10,10 @@ module Language.Haskell.GHC.Kit.CompileTo
   ) where
 
 import Data.Binary
-import DynFlags
+import FastString
 import HscTypes
 import Language.Haskell.GHC.Kit.WithIRs
 import Module
-import Outputable
 import System.Directory
 import System.FilePath
 
@@ -27,16 +26,25 @@ data CompilerStore a = CompilerStore
   , modulePut :: Module -> a -> IO ()
   }
 
-moduleKey :: Module -> FilePath
-moduleKey = showSDocOneLine unsafeGlobalDynFlags . pprModule
+moduleKey :: Module -> (FilePath, FilePath)
+moduleKey Module {..} =
+  (unpackFS (unitIdFS moduleUnitId), unpackFS (moduleNameFS moduleName))
 
 newCompilerStore :: Binary a => CompilerConfig a -> IO (CompilerStore a)
-newCompilerStore CompilerConfig {..} = do
-  createDirectoryIfMissing True topdir
+newCompilerStore CompilerConfig {..} =
   pure
-    CompilerStore {moduleGet = decodeFile . tofn, modulePut = encodeFile . tofn}
+    CompilerStore
+    { moduleGet = decodeFile . tofn
+    , modulePut =
+        \mod_key x ->
+          let fn = tofn mod_key
+          in do createDirectoryIfMissing True $ takeDirectory fn
+                encodeFile fn x
+    }
   where
-    tofn = (topdir </>) . moduleKey
+    tofn mod_key = topdir </> k0 </> k1
+      where
+        (k0, k1) = moduleKey mod_key
 
 newtype Compiler a = Compiler
   { runCompiler :: ModSummary -> IR -> IO a
