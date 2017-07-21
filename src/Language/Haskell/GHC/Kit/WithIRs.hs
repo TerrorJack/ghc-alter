@@ -50,6 +50,7 @@ toRunPhase cont = do
         \_ _ _ -> do
           flag <- readIORef flag_ref
           when flag $ do
+            writeIORef flag_ref False
             mod_summary <- readIORef mod_summary_ref
             ir <-
               IR <$> readIORef core_ref <*> readIORef corePrep_ref <*>
