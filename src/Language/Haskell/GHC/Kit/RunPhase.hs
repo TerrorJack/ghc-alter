@@ -20,6 +20,7 @@ import CoreSyn
 import CoreToStg
 import CostCentre
 import Data.Maybe
+import Data.Semigroup
 import DriverPhases
 import DriverPipeline
 import DynFlags
@@ -68,6 +69,26 @@ defaultRunPhase =
   where
     three _ = two
     two _ _ = pure ()
+
+instance Monoid RunPhase where
+  mempty = defaultRunPhase
+  mappend rp0 rp1 =
+    RunPhase
+    { onenter = three onenter
+    , onleave = three onleave
+    , core = two core
+    , corePrep = two corePrep
+    , stgFromCore = two stgFromCore
+    , stg = two stg
+    , cmmFromStg = two cmmFromStg
+    , cmm = two cmm
+    , cmmRaw = two cmmRaw
+    }
+    where
+      three tag x y z = tag rp0 x y z *> tag rp1 x y z
+      two tag x y = tag rp0 x y *> tag rp1 x y
+
+instance Semigroup RunPhase
 
 myCoreToStgWith ::
      RunPhase

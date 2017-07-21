@@ -3,7 +3,6 @@ module Main
   ) where
 
 import Language.Haskell.GHC.Kit.Boot
-import System.FilePath
 
 main :: IO ()
 main = do

@@ -9,7 +9,6 @@ module Language.Haskell.GHC.Kit.Boot
   ) where
 
 import Control.Monad
-import Data.Char
 import qualified Language.Haskell.GHC.Kit.BuildInfo as P
 import System.Directory
 import System.Environment
