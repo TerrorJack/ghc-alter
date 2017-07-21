@@ -66,11 +66,6 @@ boot bt@BootTask {..} = do
   withCurrentDirectory (bootlibdir </> "integer-gmp") $
     copyFile ("gmp" </> "ghc-gmp.h") ("include" </> "ghc-gmp.h")
   createDirectoryIfMissing True pkgDb
-  ghclibdir <-
-    takeWhile (not . isSpace) <$> readProcess ghc ["--print-libdir"] ""
-  copyFile
-    (ghclibdir </> "package.conf.d" </> "rts.conf")
-    (pkgDb </> "rts.conf")
   callProcess ghcPkg ["--package-db", pkgDb, "recache"]
   withCurrentDirectory bootlibdir $ do
     bootLib bt {bootlibdir = "ghc-prim"}
