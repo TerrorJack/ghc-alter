@@ -1,20 +1,29 @@
+{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE StrictData #-}
 
-module Language.Haskell.GHC.Kit.WithIRs
+module Language.Haskell.GHC.Kit.Compiler
   ( IR(..)
+  , CompilerConfig(..)
+  , CompilerSession(..)
+  , newCompilerSession
+  , Compiler(..)
   , toRunPhase
   ) where
 
 import Cmm
 import Control.Monad
 import CoreSyn
+import Data.Binary
 import DriverPipeline
+import FastString
 import GHC.Conc
 import HscTypes
 import qualified Language.Haskell.GHC.Kit.RunPhase as RP
 import Module
 import StgSyn
 import qualified Stream
+import System.Directory
+import System.FilePath
 
 data IR = IR
   { core :: CgGuts
@@ -24,8 +33,41 @@ data IR = IR
   , cmmRaw :: Stream.Stream IO RawCmmGroup ()
   }
 
-toRunPhase :: (ModSummary -> IR -> IO ()) -> IO RP.RunPhase
-toRunPhase cont = do
+newtype CompilerConfig a = CompilerConfig
+  { topdir :: FilePath
+  }
+
+data CompilerSession a = CompilerSession
+  { moduleGet :: Module -> IO a
+  , modulePut :: Module -> a -> IO ()
+  }
+
+moduleKey :: Module -> (FilePath, FilePath)
+moduleKey Module {..} =
+  (unpackFS (unitIdFS moduleUnitId), unpackFS (moduleNameFS moduleName))
+
+newCompilerSession :: Binary a => CompilerConfig a -> IO (CompilerSession a)
+newCompilerSession CompilerConfig {..} =
+  pure
+    CompilerSession
+    { moduleGet = decodeFile . tofn
+    , modulePut =
+        \mod_key x ->
+          let fn = tofn mod_key
+          in do createDirectoryIfMissing True $ takeDirectory fn
+                encodeFile fn x
+    }
+  where
+    tofn mod_key = topdir </> k0 </> k1
+      where
+        (k0, k1) = moduleKey mod_key
+
+newtype Compiler a = Compiler
+  { runCompiler :: CompilerSession a -> ModSummary -> IR -> IO ()
+  }
+
+toRunPhase :: CompilerSession a -> Compiler a -> IO RP.RunPhase
+toRunPhase s Compiler {..} = do
   flag_set_ref <- newTVarIO emptyModuleSet
   core_map_ref <- newTVarIO emptyModuleEnv
   corePrep_map_ref <- newTVarIO emptyModuleEnv
@@ -61,7 +103,7 @@ toRunPhase cont = do
                          read_map cmmFromStg_map_ref <*>
                          read_map cmm_map_ref <*>
                          read_map cmmRaw_map_ref
-                       pure $ cont mod_summary ir
+                       pure $ runCompiler s mod_summary ir
             _ -> pure ()
     , RP.core = write_map core_map_ref
     , RP.corePrep = write_map corePrep_map_ref

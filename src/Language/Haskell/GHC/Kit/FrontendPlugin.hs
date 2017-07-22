@@ -10,29 +10,30 @@ import Data.Functor
 import GHC
 import GhcPlugins
 import Hooks
-import Language.Haskell.GHC.Kit.CompileTo
+import Language.Haskell.GHC.Kit.Compiler
 import Language.Haskell.GHC.Kit.RunPhase (runPhaseWith)
 import Language.Haskell.GHC.Kit.WalkAST
-import Language.Haskell.GHC.Kit.WithIRs
 
-coreAction :: ModSummary -> IR -> IO ()
-coreAction ModSummary {..} IR {core = CgGuts {..}} = do
-  putStrLn $ "Current Module: " ++ showSDocUnsafe (ppr ms_mod)
-  let bs = do
-        b <- cg_binds
-        case b of
-          NonRec v _ -> [v]
-          Rec bs' -> [v | (v, _) <- bs']
-  putStrLn $ "Top-level Binding Modules: " ++ showSDocUnsafe (ppr (extmods bs))
-  let ms = extmods cg_binds
-  putStrLn $ "Dependent Modules: " ++ showSDocUnsafe (ppr ms)
+dummyCompiler :: Compiler ()
+dummyCompiler =
+  Compiler $ \CompilerSession {..} ModSummary {..} IR {core = CgGuts {..}} -> do
+    putStrLn $ "Current Module: " ++ showSDocUnsafe (ppr ms_mod)
+    let bs = do
+          b <- cg_binds
+          case b of
+            NonRec v _ -> [v]
+            Rec bs' -> [v | (v, _) <- bs']
+    putStrLn $
+      "Top-level Binding Modules: " ++ showSDocUnsafe (ppr (extmods bs))
+    let ms = extmods cg_binds
+    putStrLn $ "Dependent Modules: " ++ showSDocUnsafe (ppr ms)
+    modulePut ms_mod ()
 
 frontendAction :: [String] -> [(String, Maybe Phase)] -> Ghc ()
 frontendAction args targets = do
   liftIO $ putStrLn $ "args: " ++ show args
-  db <- liftIO $ newCompilerStore $ CompilerConfig "../../.boot/compile-to"
-  finale <- liftIO $ compileTo db (Compiler coreAction)
-  rp <- liftIO $ toRunPhase finale
+  db <- liftIO $ newCompilerSession $ CompilerConfig "../../.boot/compile-to"
+  rp <- liftIO $ toRunPhase db dummyCompiler
   dflags <- getSessionDynFlags
   void $
     setSessionDynFlags
