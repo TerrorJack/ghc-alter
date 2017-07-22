@@ -5,6 +5,7 @@ module Language.Haskell.GHC.Kit.Compiler
   ( IR(..)
   , CompilerConfig(..)
   , CompilerSession(..)
+  , moduleKey
   , newCompilerSession
   , Compiler(..)
   , toRunPhase
