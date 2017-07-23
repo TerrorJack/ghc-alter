@@ -563,6 +563,9 @@ module GHC.Prim (
         delay#,
         waitRead#,
         waitWrite#,
+        asyncRead#,
+        asyncWrite#,
+        asyncDoProc#,
         
 -- * Concurrency primitives
 -- |
@@ -3047,6 +3050,21 @@ waitRead# = waitRead#
 
 waitWrite# :: Int# -> State# s -> State# s
 waitWrite# = waitWrite#
+
+-- |Asynchronously read bytes from specified file descriptor.
+
+asyncRead# :: Int# -> Int# -> Int# -> Addr# -> State# (RealWorld) -> (# State# (RealWorld),Int#,Int# #)
+asyncRead# = asyncRead#
+
+-- |Asynchronously write bytes from specified file descriptor.
+
+asyncWrite# :: Int# -> Int# -> Int# -> Addr# -> State# (RealWorld) -> (# State# (RealWorld),Int#,Int# #)
+asyncWrite# = asyncWrite#
+
+-- |Asynchronously perform procedure (first arg), passing it 2nd arg.
+
+asyncDoProc# :: Addr# -> Addr# -> State# (RealWorld) -> (# State# (RealWorld),Int#,Int# #)
+asyncDoProc# = asyncDoProc#
 
 -- | @State\#@ is the primitive, unlifted type of states.  It has
 --         one type parameter, thus @State\# RealWorld@, or @State\# s@,

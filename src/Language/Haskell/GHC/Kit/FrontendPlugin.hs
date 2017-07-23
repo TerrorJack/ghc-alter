@@ -11,14 +11,13 @@ import GHC
 import GhcPlugins
 import Hooks
 import Language.Haskell.GHC.Kit.Compiler
-import Language.Haskell.GHC.Kit.RabbitHole
 import Language.Haskell.GHC.Kit.RunPhase (runPhaseWith)
 
 frontendAction :: [String] -> [(String, Maybe Phase)] -> Ghc ()
 frontendAction args targets = do
   liftIO $ putStrLn $ "args: " ++ show args
   db <- liftIO $ newCompilerSession $ CompilerConfig "../../.boot/compile-to"
-  rp <- liftIO $ toRunPhase db rabbitHole
+  rp <- liftIO $ toRunPhase db ((Compiler $ \_ _ _ -> pure ()) :: Compiler ())
   dflags <- getSessionDynFlags
   void $
     setSessionDynFlags

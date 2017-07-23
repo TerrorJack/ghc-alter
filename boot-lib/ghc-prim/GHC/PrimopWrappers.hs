@@ -1083,6 +1083,15 @@ waitRead# a1 a2 = (GHC.Prim.waitRead#) a1 a2
 {-# NOINLINE waitWrite# #-}
 waitWrite# :: Int# -> State# s -> State# s
 waitWrite# a1 a2 = (GHC.Prim.waitWrite#) a1 a2
+{-# NOINLINE asyncRead# #-}
+asyncRead# :: Int# -> Int# -> Int# -> Addr# -> State# (RealWorld) -> (# State# (RealWorld),Int#,Int# #)
+asyncRead# a1 a2 a3 a4 a5 = (GHC.Prim.asyncRead#) a1 a2 a3 a4 a5
+{-# NOINLINE asyncWrite# #-}
+asyncWrite# :: Int# -> Int# -> Int# -> Addr# -> State# (RealWorld) -> (# State# (RealWorld),Int#,Int# #)
+asyncWrite# a1 a2 a3 a4 a5 = (GHC.Prim.asyncWrite#) a1 a2 a3 a4 a5
+{-# NOINLINE asyncDoProc# #-}
+asyncDoProc# :: Addr# -> Addr# -> State# (RealWorld) -> (# State# (RealWorld),Int#,Int# #)
+asyncDoProc# a1 a2 a3 = (GHC.Prim.asyncDoProc#) a1 a2 a3
 {-# NOINLINE fork# #-}
 fork# :: a -> State# (RealWorld) -> (# State# (RealWorld),ThreadId# #)
 fork# a1 a2 = (GHC.Prim.fork#) a1 a2
