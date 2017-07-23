@@ -83,5 +83,5 @@ Library
     -- We need to set the unit ID to ghc-prim (without a version number)
     -- as it's magic.
     ghc-options: -this-unit-id ghc-prim
-	
-	cc-options: -Wno-sync-nand
+
+    cc-options: -Wno-sync-nand
