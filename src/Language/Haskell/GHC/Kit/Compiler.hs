@@ -19,7 +19,7 @@ import DriverPipeline
 import FastString
 import GHC.Conc
 import HscTypes
-import qualified Language.Haskell.GHC.Kit.RunPhase as RP
+import qualified Language.Haskell.GHC.Kit.Hooks.RunPhase as RP
 import Module
 import StgSyn
 import qualified Stream

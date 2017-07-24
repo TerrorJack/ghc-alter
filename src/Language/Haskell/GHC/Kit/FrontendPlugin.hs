@@ -11,7 +11,7 @@ import GHC
 import GhcPlugins
 import Hooks
 import Language.Haskell.GHC.Kit.Compiler
-import Language.Haskell.GHC.Kit.RunPhase (runPhaseWith)
+import Language.Haskell.GHC.Kit.Hooks.RunPhase (runPhaseWith)
 
 frontendAction :: [String] -> [(String, Maybe Phase)] -> Ghc ()
 frontendAction args targets = do
