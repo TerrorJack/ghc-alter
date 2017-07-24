@@ -37,8 +37,6 @@ before_install:
 install: true
 
 script:
-  - stack --no-terminal install
-
   - cd boot-lib
 
   - cd integer-gmp
@@ -52,5 +50,3 @@ script:
   - cd ..
   
   - stack --no-terminal test
-
-  - ls -R .boot/

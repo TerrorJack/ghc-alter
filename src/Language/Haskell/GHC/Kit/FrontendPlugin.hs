@@ -28,9 +28,8 @@ frontendAction args targets = do
       modulePut ms_mod "233"
       s <- moduleGet ms_mod
       unless (s == "233") $ fail "No 233, wryyyyyyyy"
-      putStrLn $
-        "Num of located Haskell Bindings: " ++ show (lengthBag tcg_binds)
-      putStrLn $ "Num of the tidied main bindings: " ++ show (length cg_binds)
+      putStrLn $ "Length of tcg_binds: " ++ show (lengthBag tcg_binds)
+      putStrLn $ "Length of cg_binds: " ++ show (length cg_binds)
       putStrLn $ "Length of corePrep: " ++ show (length corePrep)
       putStrLn $ "Length of stgFromCore: " ++ show (length stgFromCore)
       putStrLn $ "Length of stg: " ++ show (length stg)
@@ -39,7 +38,7 @@ frontendAction args targets = do
       cmm_list <- Stream.collect cmm
       putStrLn $ "Length of cmm: " ++ show (length cmm_list)
       cmmRaw_list <- Stream.collect cmmRaw
-      putStrLn $ "Length of cmmRaw" ++ show (length cmmRaw_list)
+      putStrLn $ "Length of cmmRaw: " ++ show (length cmmRaw_list)
   dflags <- getSessionDynFlags
   void $ setSessionDynFlags dflags {ghcMode = CompManager, hooks = h}
   sequenceA [guessTarget t f | (t, f) <- targets] >>= setTargets
