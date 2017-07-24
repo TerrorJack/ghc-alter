@@ -17,7 +17,15 @@ frontendAction :: [String] -> [(String, Maybe Phase)] -> Ghc ()
 frontendAction args targets = do
   liftIO $ putStrLn $ "args: " ++ show args
   db <- liftIO $ newCompilerSession $ CompilerConfig "../../.boot/compile-to"
-  rp <- liftIO $ toRunPhase db ((Compiler $ \_ _ _ -> pure ()) :: Compiler ())
+  rp <-
+    liftIO $
+    toRunPhase db $
+    Compiler $ \CompilerSession {..} ModSummary {..} _ -> do
+      modulePut ms_mod "233"
+      s <- moduleGet ms_mod
+      if s == "233"
+        then putStrLn "233"
+        else fail "No 233, wryyyyyyyy"
   dflags <- getSessionDynFlags
   void $
     setSessionDynFlags

@@ -47,15 +47,34 @@ moduleKey :: Module -> (FilePath, FilePath)
 moduleKey Module {..} =
   (unpackFS (unitIdFS moduleUnitId), unpackFS (moduleNameFS moduleName))
 
+modifyTVar' :: TVar a -> (a -> a) -> STM ()
+modifyTVar' var f = do
+  x <- readTVar var
+  writeTVar var $! f x
+
 newCompilerSession :: Binary a => CompilerConfig a -> IO (CompilerSession a)
-newCompilerSession CompilerConfig {..} =
+newCompilerSession CompilerConfig {..} = do
+  cache_map_ref <- newTVarIO emptyModuleEnv
   pure
     CompilerSession
-    { moduleGet = decodeFile . tofn
+    { moduleGet =
+        \mod_key -> do
+          cache_map <- atomically $ readTVar cache_map_ref
+          case lookupModuleEnv cache_map mod_key of
+            Just x -> pure x
+            _ -> do
+              x <- decodeFile $ tofn mod_key
+              atomically $
+                modifyTVar' cache_map_ref $ \cache_map' ->
+                  extendModuleEnv cache_map' mod_key x
+              pure x
     , modulePut =
         \mod_key x ->
           let fn = tofn mod_key
-          in do createDirectoryIfMissing True $ takeDirectory fn
+          in do atomically $
+                  modifyTVar' cache_map_ref $ \cache_map' ->
+                    extendModuleEnv cache_map' mod_key x
+                createDirectoryIfMissing True $ takeDirectory fn
                 encodeFile fn x
     }
   where
@@ -95,7 +114,8 @@ toRunPhase s Compiler {..} = do
                    if key `elemModuleSet` flag_set
                      then pure $ pure ()
                      else do
-                       writeTVar flag_set_ref $ extendModuleSet flag_set key
+                       modifyTVar' flag_set_ref $ \flag_set' ->
+                         extendModuleSet flag_set' key
                        ir <-
                          IR <$> read_map core_map_ref <*>
                          read_map corePrep_map_ref <*>
@@ -116,6 +136,5 @@ toRunPhase s Compiler {..} = do
     }
   where
     write_map ref mod_summary x =
-      atomically $ do
-        m <- readTVar ref
-        writeTVar ref $ extendModuleEnv m (ms_mod mod_summary) x
+      atomically $
+      modifyTVar' ref $ \m -> extendModuleEnv m (ms_mod mod_summary) x
