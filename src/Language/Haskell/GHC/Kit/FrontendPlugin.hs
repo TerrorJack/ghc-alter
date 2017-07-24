@@ -5,34 +5,43 @@ module Language.Haskell.GHC.Kit.FrontendPlugin
   ( frontendPlugin
   ) where
 
+import Bag
+import Control.Monad
 import Control.Monad.IO.Class
-import Data.Functor
 import GHC
 import GhcPlugins
-import Hooks
 import Language.Haskell.GHC.Kit.Compiler
-import Language.Haskell.GHC.Kit.Hooks.RunPhase (runPhaseWith)
+import qualified Stream
+import TcRnTypes
 
 frontendAction :: [String] -> [(String, Maybe Phase)] -> Ghc ()
 frontendAction args targets = do
   liftIO $ putStrLn $ "args: " ++ show args
   db <- liftIO $ newCompilerSession $ CompilerConfig "../../.boot/compile-to"
-  rp <-
+  h <-
     liftIO $
-    toRunPhase db $
-    Compiler $ \CompilerSession {..} ModSummary {..} _ -> do
+    toHooks db $
+    Compiler $ \CompilerSession {..} ModSummary {..} IR { tc = TcGblEnv {..}
+                                                        , core = CgGuts {..}
+                                                        , ..
+                                                        } -> do
       modulePut ms_mod "233"
       s <- moduleGet ms_mod
-      if s == "233"
-        then putStrLn "233"
-        else fail "No 233, wryyyyyyyy"
+      unless (s == "233") $ fail "No 233, wryyyyyyyy"
+      putStrLn $
+        "Num of located Haskell Bindings: " ++ show (lengthBag tcg_binds)
+      putStrLn $ "Num of the tidied main bindings: " ++ show (length cg_binds)
+      putStrLn $ "Length of corePrep: " ++ show (length corePrep)
+      putStrLn $ "Length of stgFromCore: " ++ show (length stgFromCore)
+      putStrLn $ "Length of stg: " ++ show (length stg)
+      cmmFromStg_list <- Stream.collect cmmFromStg
+      putStrLn $ "Length of cmmFromStg: " ++ show (length cmmFromStg_list)
+      cmm_list <- Stream.collect cmm
+      putStrLn $ "Length of cmm: " ++ show (length cmm_list)
+      cmmRaw_list <- Stream.collect cmmRaw
+      putStrLn $ "Length of cmmRaw" ++ show (length cmmRaw_list)
   dflags <- getSessionDynFlags
-  void $
-    setSessionDynFlags
-      dflags
-      { ghcMode = CompManager
-      , hooks = emptyHooks {runPhaseHook = Just $ runPhaseWith rp}
-      }
+  void $ setSessionDynFlags dflags {ghcMode = CompManager, hooks = h}
   sequenceA [guessTarget t f | (t, f) <- targets] >>= setTargets
   sf <- load LoadAllTargets
   case sf of
