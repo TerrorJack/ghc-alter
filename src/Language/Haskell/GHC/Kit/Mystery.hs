@@ -3,6 +3,7 @@
 module Language.Haskell.GHC.Kit.Mystery where
 
 import Control.Monad
+import Data.Foldable
 import qualified Data.Set as Set
 import Language.Haskell.GHC.Kit.Compiler
 import Name
@@ -23,19 +24,16 @@ compiler :: Compiler
 compiler =
   Compiler $ \_ IR {..} -> do
     let ns = stgProgLHS stg
-        os = Set.map occName ns
-        ss = Set.map occNameString os
     putStrLn $ "Num of stg bindings: " ++ show (Set.size ns)
-    when (Set.size ns /= Set.size os) $
-      putStrLn $ "Bibibi!! Num of occNames: " ++ show (Set.size os)
-    when (Set.size os /= Set.size ss) $
-      putStrLn $ "Bibibi!! Num of String occNames: " ++ show (Set.size ss)
-    putStrLn $
-      "Num of external stg bindings: " ++
-      show (Set.size $ Set.filter isExternalName ns)
-    putStrLn $
-      "Num of system stg bindings: " ++
-      show (Set.size $ Set.filter isSystemName ns)
-    putStrLn $
-      "Num of wired-in stg bindings: " ++
-      show (Set.size $ Set.filter isWiredInName ns)
+    for_
+      [ ("External", isExternalName)
+      , ("System", isSystemName)
+      , ("WiredIn", isWiredInName)
+      ] $ \(n, f) -> do
+      let local_ns = Set.filter f ns
+          local_os = Set.map occName local_ns
+      putStrLn $ "Num of " ++ n ++ " stg bindings: " ++ show (Set.size local_ns)
+      when (Set.size local_ns /= Set.size local_os) $
+        putStrLn $
+        "BiBiBi!! Num of " ++
+        n ++ " occName stg bindings: " ++ show (Set.size local_os)
