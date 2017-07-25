@@ -11,6 +11,7 @@ import Control.Monad.IO.Class
 import GHC
 import GhcPlugins
 import Language.Haskell.GHC.Kit.Compiler
+import Language.Haskell.GHC.Kit.CompilerStore
 import qualified Stream
 import TcRnTypes
 
@@ -18,7 +19,8 @@ frontendAction :: [String] -> [(String, Maybe Phase)] -> Ghc ()
 frontendAction args targets = do
   liftIO $ putStrLn $ "args: " ++ show args
   CompilerStore {..} <-
-    liftIO $ newCompilerStore $ CompilerConfig "../../.boot/compile-to"
+    liftIO $
+    newCompilerStore $ CompilerConfig "../../.boot/compile-to" "ghc-kit_o"
   h <-
     liftIO $
     toHooks $
