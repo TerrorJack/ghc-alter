@@ -9,7 +9,6 @@ module Language.Haskell.GHC.Kit.CompilerStore
   ) where
 
 import Data.Binary
-import FastString
 import GHC.Conc
 import Module
 import System.Directory
@@ -25,8 +24,7 @@ data CompilerStore a = CompilerStore
   }
 
 moduleKey :: Module -> (FilePath, FilePath)
-moduleKey Module {..} =
-  (unpackFS (unitIdFS moduleUnitId), unpackFS (moduleNameFS moduleName))
+moduleKey Module {..} = (unitIdString moduleUnitId, moduleNameString moduleName)
 
 modifyTVar' :: TVar a -> (a -> a) -> STM ()
 modifyTVar' var f = do
@@ -59,6 +57,11 @@ newCompilerStore CompilerConfig {..} = do
                 encodeFile fn x
     }
   where
-    tofn mod_key = topdir </> k0 </> k1 <.> ext
+    tofn mod_key = topdir </> k0 </> f k1 <.> ext
       where
         (k0, k1) = moduleKey mod_key
+        f p =
+          case span (/= '.') p of
+            (p0, "") -> p0
+            (p0, '.':p1) -> p0 </> f p1
+            _ -> error "Impossible happened in tofn"
