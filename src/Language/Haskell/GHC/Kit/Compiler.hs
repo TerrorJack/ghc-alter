@@ -4,9 +4,9 @@
 module Language.Haskell.GHC.Kit.Compiler
   ( IR(..)
   , CompilerConfig(..)
-  , CompilerSession(..)
+  , CompilerStore(..)
   , moduleKey
-  , newCompilerSession
+  , newCompilerStore
   , Compiler(..)
   , toHooks
   ) where
@@ -42,7 +42,7 @@ newtype CompilerConfig a = CompilerConfig
   { topdir :: FilePath
   }
 
-data CompilerSession a = CompilerSession
+data CompilerStore a = CompilerStore
   { moduleGet :: Module -> IO a
   , modulePut :: Module -> a -> IO ()
   }
@@ -56,11 +56,11 @@ modifyTVar' var f = do
   x <- readTVar var
   writeTVar var $! f x
 
-newCompilerSession :: Binary a => CompilerConfig a -> IO (CompilerSession a)
-newCompilerSession CompilerConfig {..} = do
+newCompilerStore :: Binary a => CompilerConfig a -> IO (CompilerStore a)
+newCompilerStore CompilerConfig {..} = do
   cache_map_ref <- newTVarIO emptyModuleEnv
   pure
-    CompilerSession
+    CompilerStore
     { moduleGet =
         \mod_key -> do
           cache_map <- atomically $ readTVar cache_map_ref
@@ -86,12 +86,12 @@ newCompilerSession CompilerConfig {..} = do
       where
         (k0, k1) = moduleKey mod_key
 
-newtype Compiler a = Compiler
-  { runCompiler :: CompilerSession a -> ModSummary -> IR -> IO ()
+newtype Compiler = Compiler
+  { runCompiler :: ModSummary -> IR -> IO ()
   }
 
-toHooks :: CompilerSession a -> Compiler a -> IO Hooks
-toHooks s Compiler {..} = do
+toHooks :: Compiler -> IO Hooks
+toHooks Compiler {..} = do
   flag_set_ref <- newTVarIO emptyModuleSet
   tc_map_ref <- newTVarIO emptyModuleEnv
   core_map_ref <- newTVarIO emptyModuleEnv
@@ -134,7 +134,7 @@ toHooks s Compiler {..} = do
                              read_map cmmFromStg_map_ref <*>
                              read_map cmm_map_ref <*>
                              read_map cmmRaw_map_ref
-                           pure $ runCompiler s mod_summary ir
+                           pure $ runCompiler mod_summary ir
                 _ -> pure ()
         , RP.core = write_map core_map_ref
         , RP.corePrep = write_map corePrep_map_ref

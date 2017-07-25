@@ -17,14 +17,12 @@ import TcRnTypes
 frontendAction :: [String] -> [(String, Maybe Phase)] -> Ghc ()
 frontendAction args targets = do
   liftIO $ putStrLn $ "args: " ++ show args
-  db <- liftIO $ newCompilerSession $ CompilerConfig "../../.boot/compile-to"
+  CompilerStore {..} <-
+    liftIO $ newCompilerStore $ CompilerConfig "../../.boot/compile-to"
   h <-
     liftIO $
-    toHooks db $
-    Compiler $ \CompilerSession {..} ModSummary {..} IR { tc = TcGblEnv {..}
-                                                        , core = CgGuts {..}
-                                                        , ..
-                                                        } -> do
+    toHooks $
+    Compiler $ \ModSummary {..} IR {tc = TcGblEnv {..}, core = CgGuts {..}, ..} -> do
       modulePut ms_mod "233"
       s <- moduleGet ms_mod
       unless (s == "233") $ fail "No 233, wryyyyyyyy"
