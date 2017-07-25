@@ -2,6 +2,7 @@
 
 module Language.Haskell.GHC.Kit.Mystery where
 
+import Control.Monad
 import qualified Data.Set as Set
 import Language.Haskell.GHC.Kit.Compiler
 import Name
@@ -22,7 +23,10 @@ compiler :: Compiler
 compiler =
   Compiler $ \_ IR {..} -> do
     let ns = stgProgLHS stg
+        ss = Set.map (occNameString . occName) ns
     putStrLn $ "Num of stg bindings: " ++ show (Set.size ns)
+    when (Set.size ns /= Set.size ss) $
+      putStrLn $ "Bibibi!! Num of serialized bindings: " ++ show (Set.size ss)
     putStrLn $
       "Num of external stg bindings: " ++
       show (Set.size $ Set.filter isExternalName ns)
