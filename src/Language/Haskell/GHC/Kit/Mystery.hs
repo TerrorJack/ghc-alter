@@ -7,6 +7,7 @@ import Data.Foldable
 import qualified Data.Set as Set
 import Language.Haskell.GHC.Kit.Compiler
 import Name
+import Outputable
 import StgSyn
 
 stgProgLHS :: [StgTopBinding] -> Set.Set Name
@@ -24,16 +25,18 @@ compiler :: Compiler
 compiler =
   Compiler $ \_ IR {..} -> do
     let ns = stgProgLHS stg
-    putStrLn $ "Num of stg bindings: " ++ show (Set.size ns)
     for_
-      [ ("External", isExternalName)
+      [ ("All", const True)
+      , ("External", isExternalName)
       , ("System", isSystemName)
       , ("WiredIn", isWiredInName)
       ] $ \(n, f) -> do
       let local_ns = Set.filter f ns
           local_os = Set.map occName local_ns
       putStrLn $ "Num of " ++ n ++ " stg bindings: " ++ show (Set.size local_ns)
-      when (Set.size local_ns /= Set.size local_os) $
+      when (Set.size local_ns < 64) $ putStrLn $ showSDocUnsafe $ ppr local_ns
+      when (Set.size local_ns /= Set.size local_os) $ do
         putStrLn $
-        "BiBiBi!! Num of " ++
-        n ++ " occName stg bindings: " ++ show (Set.size local_os)
+          "BiBiBi!! Num of " ++
+          n ++ " occName stg bindings: " ++ show (Set.size local_os)
+        when (Set.size local_os < 64) $ putStrLn $ showSDocUnsafe $ ppr local_os
