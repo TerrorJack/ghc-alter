@@ -8,7 +8,6 @@ module Language.Haskell.GHC.Kit.CompilerStore
   , modifyTVar'
   ) where
 
-import Data.Binary
 import GHC.Conc
 import Module
 import System.Directory
@@ -16,6 +15,8 @@ import System.FilePath
 
 data CompilerConfig a = CompilerConfig
   { topdir, ext :: FilePath
+  , rawGet :: FilePath -> IO a
+  , rawPut :: FilePath -> a -> IO ()
   }
 
 data CompilerStore a = CompilerStore
@@ -31,7 +32,7 @@ modifyTVar' var f = do
   x <- readTVar var
   writeTVar var $! f x
 
-newCompilerStore :: Binary a => CompilerConfig a -> IO (CompilerStore a)
+newCompilerStore :: CompilerConfig a -> IO (CompilerStore a)
 newCompilerStore CompilerConfig {..} = do
   cache_map_ref <- newTVarIO emptyModuleEnv
   pure
@@ -42,7 +43,7 @@ newCompilerStore CompilerConfig {..} = do
           case lookupModuleEnv cache_map mod_key of
             Just x -> pure x
             _ -> do
-              x <- decodeFile $ tofn mod_key
+              x <- rawGet $ tofn mod_key
               atomically $
                 modifyTVar' cache_map_ref $ \cache_map' ->
                   extendModuleEnv cache_map' mod_key x
@@ -54,7 +55,7 @@ newCompilerStore CompilerConfig {..} = do
                   modifyTVar' cache_map_ref $ \cache_map' ->
                     extendModuleEnv cache_map' mod_key x
                 createDirectoryIfMissing True $ takeDirectory fn
-                encodeFile fn x
+                rawPut fn x
     }
   where
     tofn mod_key = topdir </> k0 </> f k1 <.> ext
