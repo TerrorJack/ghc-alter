@@ -35,10 +35,9 @@ compiler =
           local_os = Set.map occName local_ns
       putStrLn $ "Num of " ++ n ++ " stg bindings: " ++ show (Set.size local_ns)
       when (Set.size local_ns < 64) $ putStrLn $ showSDocUnsafe $ ppr local_ns
-      when ((n == "All") && (Set.size local_ns < 64)) $
-        putStrLn $ showSDocUnsafe $ ppr stg
       when (Set.size local_ns /= Set.size local_os) $ do
         putStrLn $
           "BiBiBi!! Num of " ++
           n ++ " occName stg bindings: " ++ show (Set.size local_os)
         when (Set.size local_os < 64) $ putStrLn $ showSDocUnsafe $ ppr local_os
+        when (n == "System") $ putStrLn $ showSDocUnsafe $ ppr stg
