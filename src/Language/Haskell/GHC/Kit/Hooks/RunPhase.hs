@@ -13,25 +13,18 @@ import CmmBuildInfoTables
 import CmmInfo
 import CmmPipeline
 import CodeOutput
-import Control.Monad
 import Control.Monad.IO.Class
 import CorePrep
 import CoreSyn
 import CoreToStg
 import CostCentre
-import Data.Maybe
-import Data.Semigroup
-import DriverPhases
 import DriverPipeline
 import DynFlags
 import ErrUtils
-import GHC.Base (when)
-import Hooks
 import HscMain
 import HscTypes hiding (Hsc)
 import Module
 import Outputable
-import Panic
 import PipelineMonad
 import Platform
 import ProfInit
@@ -39,8 +32,6 @@ import SimplStg
 import StgCmm
 import StgSyn
 import qualified Stream
-import SysTools
-import System.FilePath
 import TyCon
 import UniqSupply
 
@@ -69,26 +60,6 @@ defaultRunPhase =
   where
     three _ = two
     two _ _ = pure ()
-
-instance Monoid RunPhase where
-  mempty = defaultRunPhase
-  mappend rp0 rp1 =
-    RunPhase
-    { onenter = three onenter
-    , onleave = three onleave
-    , core = two core
-    , corePrep = two corePrep
-    , stgFromCore = two stgFromCore
-    , stg = two stg
-    , cmmFromStg = two cmmFromStg
-    , cmm = two cmm
-    , cmmRaw = two cmmRaw
-    }
-    where
-      three tag x y z = tag rp0 x y z *> tag rp1 x y z
-      two tag x y = tag rp0 x y *> tag rp1 x y
-
-instance Semigroup RunPhase
 
 myCoreToStgWith ::
      RunPhase
@@ -217,151 +188,6 @@ hscGenHardCodeWith rp@RunPhase {..} hsc_env cgguts mod_summary output_filename =
         rawcmms1
     return (output_filename', stub_c_exists, foreign_fps)
 
-runHookedPhase ::
-     PhasePlus -> FilePath -> DynFlags -> CompPipeline (PhasePlus, FilePath)
-runHookedPhase pp input dflags =
-  lookupHook runPhaseHook runPhase dflags pp input dflags
-
-pipeLoop :: PhasePlus -> FilePath -> CompPipeline (DynFlags, FilePath)
-pipeLoop phase input_fn = do
-  env <- getPipeEnv
-  dflags <- getDynFlags
-  let happensBefore' = happensBefore dflags
-      stopPhase = stop_phase env
-  case phase of
-    RealPhase realPhase
-      | realPhase `eqPhase` stopPhase ->
-        case output_spec env of
-          Temporary -> return (dflags, input_fn)
-          output -> do
-            pst <- getPipeState
-            final_fn <-
-              liftIO $
-              getOutputFilename
-                stopPhase
-                output
-                (src_basename env)
-                dflags
-                stopPhase
-                (maybe_loc pst)
-            when (final_fn /= input_fn) $ do
-              let msg = "Copying `" ++ input_fn ++ "' to `" ++ final_fn ++ "'"
-                  line_prag =
-                    Just ("{-# LINE 1 \"" ++ src_filename env ++ "\" #-}\n")
-              liftIO $ copyWithHeader dflags msg line_prag input_fn final_fn
-            return (dflags, final_fn)
-      | not (realPhase `happensBefore'` stopPhase) ->
-        panic
-          ("pipeLoop: at phase " ++
-           show realPhase ++ " but I wanted to stop at phase " ++ show stopPhase)
-    _ -> do
-      liftIO $ debugTraceMsg dflags 4 (text "Running phase" <+> ppr phase)
-      (next_phase, output_fn) <- runHookedPhase phase input_fn dflags
-      r <- pipeLoop next_phase output_fn
-      case phase of
-        HscOut {} ->
-          whenGeneratingDynamicToo dflags $ do
-            setDynFlags $ dynamicTooMkDynamicDynFlags dflags
-            _ <- pipeLoop phase input_fn
-            return ()
-        _ -> return ()
-      return r
-
-runPipeline' ::
-     PhasePlus
-  -> HscEnv
-  -> PipeEnv
-  -> FilePath
-  -> Maybe ModLocation
-  -> [FilePath]
-  -> IO (DynFlags, FilePath)
-runPipeline' start_phase hsc_env env input_fn maybe_loc foreign_os = do
-  let state = PipeState {hsc_env, maybe_loc, foreign_os = foreign_os}
-  evalP (pipeLoop start_phase input_fn) env state
-
-runPipeline ::
-     Phase
-  -> HscEnv
-  -> (FilePath, Maybe PhasePlus)
-  -> Maybe FilePath
-  -> PipelineOutput
-  -> Maybe ModLocation
-  -> [FilePath]
-  -> IO (DynFlags, FilePath)
-runPipeline stop_phase hsc_env0 (input_fn, mb_phase) mb_basename output maybe_loc foreign_os = do
-  let dflags0 = hsc_dflags hsc_env0
-      dflags = dflags0 {dumpPrefix = Just (basename ++ ".")}
-      hsc_env = hsc_env0 {hsc_dflags = dflags}
-      (input_basename, suffix) = splitExtension input_fn
-      suffix' = drop 1 suffix
-      basename
-        | Just b <- mb_basename = b
-        | otherwise = input_basename
-      start_phase = fromMaybe (RealPhase (startPhase suffix')) mb_phase
-      isHaskell (RealPhase (Unlit _)) = True
-      isHaskell (RealPhase (Cpp _)) = True
-      isHaskell (RealPhase (HsPp _)) = True
-      isHaskell (RealPhase (Hsc _)) = True
-      isHaskell HscOut {} = True
-      isHaskell _ = False
-      isHaskellishFile = isHaskell start_phase
-      env =
-        PipeEnv
-        { stop_phase
-        , src_filename = input_fn
-        , src_basename = basename
-        , src_suffix = suffix'
-        , output_spec = output
-        }
-  when (isBackpackishSuffix suffix') $
-    throwGhcExceptionIO (UsageError ("use --backpack to process " ++ input_fn))
-  let happensBefore' = happensBefore dflags
-  case start_phase of
-    RealPhase start_phase' ->
-      unless
-        (start_phase' `happensBefore'` stop_phase ||
-         start_phase' `eqPhase` stop_phase) $
-      throwGhcExceptionIO
-        (UsageError ("cannot compile this file to desired target: " ++ input_fn))
-    HscOut {} -> return ()
-  debugTraceMsg dflags 4 (text "Running the pipeline")
-  r <- runPipeline' start_phase hsc_env env input_fn maybe_loc foreign_os
-  let dflags' = hsc_dflags hsc_env
-  unless (platformOS (targetPlatform dflags') == OSMinGW32) $
-    when isHaskellishFile $
-    whenCannotGenerateDynamicToo dflags' $ do
-      debugTraceMsg
-        dflags'
-        4
-        (text "Running the pipeline again for -dynamic-too")
-      let dflags'' = dynamicTooMkDynamicDynFlags dflags'
-      hsc_env' <- newHscEnv dflags''
-      _ <- runPipeline' start_phase hsc_env' env input_fn maybe_loc foreign_os
-      return ()
-  return r
-
-compileForeign :: HscEnv -> ForeignSrcLang -> FilePath -> IO FilePath
-compileForeign hsc_env lang stub_c = do
-  let phase =
-        case lang of
-          LangC -> Cc
-          LangCxx -> Ccxx
-          LangObjc -> Cobjc
-          LangObjcxx -> Cobjcxx
-  (_, stub_o) <-
-    runPipeline
-      StopLn
-      hsc_env
-      (stub_c, Just (RealPhase phase))
-      Nothing
-      Temporary
-      Nothing
-      []
-  return stub_o
-
-compileStub :: HscEnv -> FilePath -> IO FilePath
-compileStub hsc_env = compileForeign hsc_env LangC
-
 runPhaseWith ::
      RunPhase
   -> PhasePlus
@@ -380,12 +206,9 @@ runPhaseWith rp@RunPhase {..} phase_plus input_fn dflags = do
             next_phase = hscPostBackendPhase dflags src_flavour hsc_lang
         output_fn <- phaseOutputFilename next_phase
         PipeState {hsc_env = hsc_env'} <- getPipeState
-        (outputFilename, mStub, foreign_files) <-
+        (outputFilename, _, _) <-
           liftIO $ hscGenHardCodeWith rp hsc_env' cgguts mod_summary output_fn
-        stub_o <- liftIO (mapM (compileStub hsc_env') mStub)
-        foreign_os <-
-          liftIO $ mapM (uncurry (compileForeign hsc_env')) foreign_files
-        setForeignOs (maybe [] return stub_o ++ foreign_os)
+        setForeignOs []
         return (RealPhase next_phase, outputFilename)
       _ -> runPhase phase_plus input_fn dflags
   liftIO $ onleave phase_plus input_fn dflags
