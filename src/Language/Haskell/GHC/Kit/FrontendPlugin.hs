@@ -9,7 +9,7 @@ import Control.Monad.IO.Class
 import GHC
 import GhcPlugins
 import Language.Haskell.GHC.Kit.Compiler
-import Language.Haskell.GHC.Kit.Mystery
+import Language.Haskell.GHC.Kit.Lovecraft
 
 frontendAction :: [String] -> [(String, Maybe Phase)] -> Ghc ()
 frontendAction args targets = do
