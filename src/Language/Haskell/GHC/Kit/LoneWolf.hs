@@ -22,7 +22,7 @@ import TyCon
 import Var
 
 stubShow :: Outputable a => String -> a -> String
-stubShow n x = n ++ " " ++ show (showSDocUnsafe $ ppr x)
+stubShow n x = "(" ++ n ++ " " ++ show (showSDocUnsafe $ ppr x) ++ ")"
 
 deriving instance Show UpdateFlag
 
@@ -61,7 +61,7 @@ instance Show DataCon where
 deriving instance Show IsCafCC
 
 instance Show ModuleName where
-  show n = "ModuleName " ++ show (moduleNameString n)
+  show n = "(ModuleName " ++ show (moduleNameString n) ++ ")"
 
 deriving instance Show Module
 
@@ -82,7 +82,7 @@ deriving instance Show UnivCoProvenance
 deriving instance Show Role
 
 instance Show Name where
-  show n = "Name " ++ show (nameStableString n)
+  show n = "(Name " ++ show (nameStableString n) ++ ")"
 
 instance Show (Branches br) where
   show _ = "Branches"
@@ -99,7 +99,7 @@ instance Show TyCon where
   show = stubShow "TyCon"
 
 instance Show Var where
-  show = stubShow "Var"
+  show n = "(Var " ++ show (nameStableString $ getName n) ++ ")"
 
 deriving instance
          (Show tyvar, Show argf) => Show (TyVarBndr tyvar argf)
