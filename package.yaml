@@ -37,6 +37,7 @@ dependencies:
   - ghc
   - process
   - template-haskell
+  - pretty-show
 
 custom-setup:
   dependencies:

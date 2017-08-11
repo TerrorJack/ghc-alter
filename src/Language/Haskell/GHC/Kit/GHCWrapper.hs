@@ -20,11 +20,12 @@ subst WrapperOptions {..} args = do
   arg <- args
   case arg of
     "--make" ->
-      ["--frontend", pluginModule, "-plugin-package", pluginPackage] ++ pkgdb
+      ["--frontend", pluginModule, "-plugin-package", pluginPackage] ++
+      pkgdb (last $ init pkgDbStack) ++ pkgdb (last pkgDbStack)
     _ -> [arg]
   where
-    pkgdb =
-      case last pkgDbStack of
+    pkgdb entry =
+      case entry of
         GlobalPackageDB -> ["-global-package-db"]
         UserPackageDB -> ["-user-package-db"]
         SpecificPackageDB p -> ["-package-db", p]

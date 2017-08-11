@@ -1,7 +1,9 @@
 {-# LANGUAGE StandaloneDeriving #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
-module Language.Haskell.GHC.Kit.LoneWolf where
+module Language.Haskell.GHC.Kit.LoneWolf
+  (
+  ) where
 
 import BasicTypes
 import CoAxiom
@@ -12,19 +14,26 @@ import ForeignCall
 import Literal
 import Module
 import Name
+import Outputable
 import PrimOp
 import StgSyn
 import TyCoRep
 import TyCon
 import Var
 
+stubShow :: Outputable a => String -> a -> String
+stubShow n x = n ++ " " ++ show (showSDocUnsafe $ ppr x)
+
 deriving instance Show UpdateFlag
 
 instance Show StgBinderInfo where
-  show = undefined
+  show sbi =
+    if satCallsOnly sbi
+      then "SatCallsOnly"
+      else "NoStgBinderInfo"
 
 instance Show CostCentreStack where
-  show = undefined
+  show = stubShow "CostCentreStack"
 
 deriving instance Show AltCon
 
@@ -47,12 +56,12 @@ deriving instance Show PrimOp
 deriving instance Show StgOp
 
 instance Show DataCon where
-  show = undefined
+  show = stubShow "DataCon"
 
 deriving instance Show IsCafCC
 
 instance Show ModuleName where
-  show = undefined
+  show n = "ModuleName " ++ show (moduleNameString n)
 
 deriving instance Show Module
 
@@ -63,20 +72,20 @@ deriving instance Show bndr => Show (Tickish bndr)
 deriving instance Show LeftOrRight
 
 instance Show CoAxiomRule where
-  show = undefined
+  show = stubShow "CoAxiomRule"
 
 instance Show CoercionHole where
-  show = undefined
+  show = stubShow "CoercionHole"
 
 deriving instance Show UnivCoProvenance
 
 deriving instance Show Role
 
 instance Show Name where
-  show = undefined
+  show n = "Name " ++ show (nameStableString n)
 
 instance Show (Branches br) where
-  show = undefined
+  show _ = "Branches"
 
 deriving instance Show (CoAxiom br)
 
@@ -87,10 +96,10 @@ deriving instance Show TyLit
 deriving instance Show ArgFlag
 
 instance Show TyCon where
-  show = undefined
+  show = stubShow "TyCon"
 
 instance Show Var where
-  show = undefined
+  show = stubShow "Var"
 
 deriving instance
          (Show tyvar, Show argf) => Show (TyVarBndr tyvar argf)

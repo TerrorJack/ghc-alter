@@ -8,12 +8,13 @@ import Control.Monad
 import Control.Monad.IO.Class
 import GHC
 import GhcPlugins
+import Language.Haskell.GHC.Kit.Caliburn
 import Language.Haskell.GHC.Kit.Compiler
-import Language.Haskell.GHC.Kit.Lovecraft
 
 frontendAction :: [String] -> [(String, Maybe Phase)] -> Ghc ()
 frontendAction args targets = do
   liftIO $ putStrLn $ "args: " ++ show args
+  compiler <- liftIO initCompiler
   h <- liftIO $ toHooks compiler
   dflags <- getSessionDynFlags
   void $ setSessionDynFlags dflags {ghcMode = CompManager, hooks = h}
