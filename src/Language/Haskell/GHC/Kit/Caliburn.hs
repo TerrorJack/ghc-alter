@@ -9,6 +9,7 @@ import Language.Haskell.GHC.Kit.Compiler
 import Language.Haskell.GHC.Kit.CompilerStore
 import Language.Haskell.GHC.Kit.LoneWolf ()
 import Outputable
+import qualified Stream
 import System.Directory
 import System.FilePath
 import Text.Show.Pretty
@@ -19,13 +20,31 @@ initCompiler = do
   let conf =
         CompilerConfig
         { topdir = pwd </> ".boot"
-        , ext = "raw.txt"
+        , ext = "txt"
         , rawGet = readFile
         , rawPut = writeFile
         }
-  raw_store <- newCompilerStore conf
-  pretty_store <- newCompilerStore conf {ext = "pretty.txt"}
+  core_raw_store <-
+    newCompilerStore conf {topdir = topdir conf </> "raw" </> "core"}
+  core_pretty_store <-
+    newCompilerStore conf {topdir = topdir conf </> "pretty" </> "core"}
+  stg_raw_store <-
+    newCompilerStore conf {topdir = topdir conf </> "raw" </> "stg"}
+  stg_pretty_store <-
+    newCompilerStore conf {topdir = topdir conf </> "pretty" </> "stg"}
+  cmmRaw_raw_store <-
+    newCompilerStore conf {topdir = topdir conf </> "raw" </> "cmmRaw"}
+  cmmRaw_pretty_store <-
+    newCompilerStore conf {topdir = topdir conf </> "pretty" </> "cmmRaw"}
   pure $
     Compiler $ \ModSummary {..} IR {..} -> do
-      modulePut raw_store ms_mod (ppShow stg)
-      modulePut pretty_store ms_mod (showSDocUnsafe $ ppr stg)
+      let dump_raw store raw = modulePut store ms_mod (ppShow raw)
+          dump_pretty store pretty =
+            modulePut store ms_mod (showSDocUnsafe $ ppr pretty)
+      dump_raw core_raw_store core
+      dump_pretty core_pretty_store (cg_binds core)
+      dump_raw stg_raw_store stg
+      dump_pretty stg_pretty_store stg
+      cmmRaw_list <- Stream.collect cmmRaw
+      dump_raw cmmRaw_raw_store cmmRaw_list
+      dump_pretty cmmRaw_pretty_store cmmRaw_list

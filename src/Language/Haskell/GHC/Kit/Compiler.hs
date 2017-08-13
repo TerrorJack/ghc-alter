@@ -62,6 +62,7 @@ toHooks Compiler {..} = do
                         case lookupModuleEnv m key of
                           Just v -> pure v
                           _ -> fail "Impossible happened in toHooks"
+                      del_map ref = modifyTVar' ref $ \m -> delModuleEnv m key
                   in join $
                      atomically $ do
                        flag_set <- readTVar flag_set_ref
@@ -79,7 +80,17 @@ toHooks Compiler {..} = do
                              read_map cmmFromStg_map_ref <*>
                              read_map cmm_map_ref <*>
                              read_map cmmRaw_map_ref
-                           pure $ runCompiler mod_summary ir
+                           pure $ do
+                             runCompiler mod_summary ir
+                             atomically $ do
+                               del_map tc_map_ref
+                               del_map core_map_ref
+                               del_map corePrep_map_ref
+                               del_map stgFromCore_map_ref
+                               del_map stg_map_ref
+                               del_map cmmFromStg_map_ref
+                               del_map cmm_map_ref
+                               del_map cmmRaw_map_ref
                 _ -> pure ()
         , RP.core = write_map core_map_ref
         , RP.corePrep = write_map corePrep_map_ref
