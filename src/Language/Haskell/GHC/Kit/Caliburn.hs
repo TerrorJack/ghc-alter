@@ -19,11 +19,7 @@ initCompiler = do
   pwd <- getCurrentDirectory
   let conf =
         CompilerConfig
-        { topdir = pwd </> ".boot"
-        , ext = "txt"
-        , rawGet = readFile
-        , rawPut = writeFile
-        }
+        {topdir = pwd </> ".boot", ext = "txt", rawPut = writeFile}
   core_raw_store <-
     newCompilerStore conf {topdir = topdir conf </> "raw" </> "core"}
   core_pretty_store <-

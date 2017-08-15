@@ -5,56 +5,32 @@ module Language.Haskell.GHC.Kit.CompilerStore
   ( CompilerConfig(..)
   , CompilerStore(..)
   , newCompilerStore
-  , modifyTVar'
   ) where
 
-import GHC.Conc
 import Module
 import System.Directory
 import System.FilePath
 
 data CompilerConfig a = CompilerConfig
   { topdir, ext :: FilePath
-  , rawGet :: FilePath -> IO a
   , rawPut :: FilePath -> a -> IO ()
   }
 
-data CompilerStore a = CompilerStore
-  { moduleGet :: Module -> IO a
-  , modulePut :: Module -> a -> IO ()
+newtype CompilerStore a = CompilerStore
+  { modulePut :: Module -> a -> IO ()
   }
 
 moduleKey :: Module -> (FilePath, FilePath)
 moduleKey Module {..} = (unitIdString moduleUnitId, moduleNameString moduleName)
 
-modifyTVar' :: TVar a -> (a -> a) -> STM ()
-modifyTVar' var f = do
-  x <- readTVar var
-  writeTVar var $! f x
-
 newCompilerStore :: CompilerConfig a -> IO (CompilerStore a)
-newCompilerStore CompilerConfig {..} = do
-  cache_map_ref <- newTVarIO emptyModuleEnv
+newCompilerStore CompilerConfig {..} =
   pure
     CompilerStore
-    { moduleGet =
-        \mod_key -> do
-          cache_map <- atomically $ readTVar cache_map_ref
-          case lookupModuleEnv cache_map mod_key of
-            Just x -> pure x
-            _ -> do
-              x <- rawGet $ tofn mod_key
-              atomically $
-                modifyTVar' cache_map_ref $ \cache_map' ->
-                  extendModuleEnv cache_map' mod_key x
-              pure x
-    , modulePut =
+    { modulePut =
         \mod_key x ->
           let fn = tofn mod_key
-          in do atomically $
-                  modifyTVar' cache_map_ref $ \cache_map' ->
-                    extendModuleEnv cache_map' mod_key x
-                createDirectoryIfMissing True $ takeDirectory fn
+          in do createDirectoryIfMissing True $ takeDirectory fn
                 rawPut fn x
     }
   where

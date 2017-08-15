@@ -14,7 +14,6 @@ import DriverPipeline
 import GHC.Conc
 import Hooks
 import HscTypes
-import Language.Haskell.GHC.Kit.CompilerStore (modifyTVar')
 import qualified Language.Haskell.GHC.Kit.Hooks.Frontend as F
 import qualified Language.Haskell.GHC.Kit.Hooks.RunPhase as RP
 import Module
@@ -34,6 +33,11 @@ data IR = IR
 newtype Compiler = Compiler
   { runCompiler :: ModSummary -> IR -> IO ()
   }
+
+modifyTVar' :: TVar a -> (a -> a) -> STM ()
+modifyTVar' var f = do
+  x <- readTVar var
+  writeTVar var $! f x
 
 toHooks :: Compiler -> IO Hooks
 toHooks Compiler {..} = do
