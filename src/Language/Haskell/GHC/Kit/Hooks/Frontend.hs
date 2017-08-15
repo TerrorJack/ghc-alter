@@ -21,18 +21,22 @@ import TcRnTypes
 data Frontend = Frontend
   { onenter :: ModSummary -> IO ()
   , onleave :: ModSummary -> TcGblEnv -> IO ()
+  , parsed :: ModSummary -> HsParsedModule -> IO ()
   }
 
 defaultFrontend :: Frontend
-defaultFrontend = Frontend {onenter = \_ -> pure (), onleave = \_ _ -> pure ()}
+defaultFrontend =
+  Frontend
+  {onenter = \_ -> pure (), onleave = \_ _ -> pure (), parsed = \_ _ -> pure ()}
 
 hscSimpleIface_ ::
      HscEnv -> TcGblEnv -> Maybe Fingerprint -> IO (ModIface, Bool, ModDetails)
 hscSimpleIface_ hsc_env tc_result mb_old_iface =
   runHsc hsc_env $ hscSimpleIface' tc_result mb_old_iface
 
-hscTypecheck_ :: Bool -> ModSummary -> Maybe HsParsedModule -> Hsc TcGblEnv
-hscTypecheck_ keep_rn mod_summary mb_rdr_module = do
+hscTypecheckWith ::
+     Frontend -> Bool -> ModSummary -> Maybe HsParsedModule -> Hsc TcGblEnv
+hscTypecheckWith Frontend {..} keep_rn mod_summary mb_rdr_module = do
   hsc_env <- getHscEnv
   let hsc_src = ms_hsc_src mod_summary
       dflags = hsc_dflags hsc_env
@@ -49,6 +53,7 @@ hscTypecheck_ keep_rn mod_summary mb_rdr_module = do
         case mb_rdr_module of
           Just hpm -> return hpm
           Nothing -> hscParse' mod_summary
+      liftIO $ parsed mod_summary hpm
       tc_result0 <- tcRnModule' hsc_env mod_summary keep_rn hpm
       if hsc_src == HsigFile
         then do
@@ -56,12 +61,12 @@ hscTypecheck_ keep_rn mod_summary mb_rdr_module = do
           ioMsgMaybe $ tcRnMergeSignatures hsc_env hpm tc_result0 iface
         else return tc_result0
 
-hscFileFrontEnd_ :: ModSummary -> Hsc TcGblEnv
-hscFileFrontEnd_ mod_summary = hscTypecheck_ False mod_summary Nothing
+hscFileFrontEndWith :: Frontend -> ModSummary -> Hsc TcGblEnv
+hscFileFrontEndWith f mod_summary = hscTypecheckWith f False mod_summary Nothing
 
 genericHscFrontendWith :: Frontend -> ModSummary -> Hsc FrontendResult
-genericHscFrontendWith Frontend {..} mod_summary = do
+genericHscFrontendWith f@Frontend {..} mod_summary = do
   liftIO $ onenter mod_summary
-  r <- hscFileFrontEnd_ mod_summary
+  r <- hscFileFrontEndWith f mod_summary
   liftIO $ onleave mod_summary r
   pure $ FrontendTypecheck r

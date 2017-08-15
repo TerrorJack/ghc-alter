@@ -22,7 +22,8 @@ import qualified Stream
 import TcRnTypes
 
 data IR = IR
-  { tc :: TcGblEnv
+  { parsed :: HsParsedModule
+  , tc :: TcGblEnv
   , core :: CgGuts
   , corePrep :: CoreProgram
   , stgFromCore, stg :: [StgTopBinding]
@@ -42,6 +43,7 @@ modifyTVar' var f = do
 toHooks :: Compiler -> IO Hooks
 toHooks Compiler {..} = do
   flag_set_ref <- newTVarIO emptyModuleSet
+  parsed_map_ref <- newTVarIO emptyModuleEnv
   tc_map_ref <- newTVarIO emptyModuleEnv
   core_map_ref <- newTVarIO emptyModuleEnv
   corePrep_map_ref <- newTVarIO emptyModuleEnv
@@ -76,7 +78,8 @@ toHooks Compiler {..} = do
                            modifyTVar' flag_set_ref $ \flag_set' ->
                              extendModuleSet flag_set' key
                            ir <-
-                             IR <$> read_map tc_map_ref <*>
+                             IR <$> read_map parsed_map_ref <*>
+                             read_map tc_map_ref <*>
                              read_map core_map_ref <*>
                              read_map corePrep_map_ref <*>
                              read_map stgFromCore_map_ref <*>
@@ -87,6 +90,7 @@ toHooks Compiler {..} = do
                            pure $ do
                              runCompiler mod_summary ir
                              atomically $ do
+                               del_map parsed_map_ref
                                del_map tc_map_ref
                                del_map core_map_ref
                                del_map corePrep_map_ref
@@ -107,7 +111,8 @@ toHooks Compiler {..} = do
     , hscFrontendHook =
         Just $
         F.genericHscFrontendWith $
-        F.defaultFrontend {F.onleave = write_map tc_map_ref}
+        F.defaultFrontend
+        {F.onleave = write_map tc_map_ref, F.parsed = write_map parsed_map_ref}
     }
   where
     write_map ref mod_summary x =

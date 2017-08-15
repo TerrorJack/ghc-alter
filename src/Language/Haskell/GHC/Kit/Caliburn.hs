@@ -20,6 +20,8 @@ initCompiler = do
   let conf =
         CompilerConfig
         {topdir = pwd </> ".boot", ext = "txt", rawPut = writeFile}
+  parsed_pretty_store <-
+    newCompilerStore conf {topdir = topdir conf </> "pretty" </> "parsed"}
   core_raw_store <-
     newCompilerStore conf {topdir = topdir conf </> "raw" </> "core"}
   core_pretty_store <-
@@ -37,6 +39,7 @@ initCompiler = do
       let dump_raw store raw = modulePut store ms_mod (ppShow raw)
           dump_pretty store pretty =
             modulePut store ms_mod (showSDocUnsafe $ ppr pretty)
+      dump_pretty parsed_pretty_store (hpm_module parsed)
       dump_raw core_raw_store core
       dump_pretty core_pretty_store (cg_binds core)
       dump_raw stg_raw_store stg
