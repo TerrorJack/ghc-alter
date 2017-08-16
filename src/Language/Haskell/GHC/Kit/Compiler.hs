@@ -27,8 +27,8 @@ data IR = IR
   , core :: CgGuts
   , corePrep :: CoreProgram
   , stgFromCore, stg :: [StgTopBinding]
-  , cmmFromStg, cmm :: Stream.Stream IO CmmGroup ()
-  , cmmRaw :: Stream.Stream IO RawCmmGroup ()
+  , cmmFromStg, cmm :: [CmmGroup]
+  , cmmRaw :: [RawCmmGroup]
   }
 
 newtype Compiler = Compiler
@@ -104,9 +104,9 @@ toHooks Compiler {..} = do
         , RP.corePrep = write_map corePrep_map_ref
         , RP.stgFromCore = write_map stgFromCore_map_ref
         , RP.stg = write_map stg_map_ref
-        , RP.cmmFromStg = write_map cmmFromStg_map_ref
-        , RP.cmm = write_map cmm_map_ref
-        , RP.cmmRaw = write_map cmmRaw_map_ref
+        , RP.cmmFromStg = write_map_stream cmmFromStg_map_ref
+        , RP.cmm = write_map_stream cmm_map_ref
+        , RP.cmmRaw = write_map_stream cmmRaw_map_ref
         }
     , hscFrontendHook =
         Just $
@@ -118,3 +118,5 @@ toHooks Compiler {..} = do
     write_map ref mod_summary x =
       atomically $
       modifyTVar' ref $ \m -> extendModuleEnv m (ms_mod mod_summary) x
+    write_map_stream ref mod_summary x =
+      Stream.collect x >>= write_map ref mod_summary

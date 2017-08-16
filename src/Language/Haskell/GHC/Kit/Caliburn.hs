@@ -9,7 +9,6 @@ import Language.Haskell.GHC.Kit.Compiler
 import Language.Haskell.GHC.Kit.CompilerStore
 import Language.Haskell.GHC.Kit.LoneWolf ()
 import Outputable
-import qualified Stream
 import System.Directory
 import System.FilePath
 import Text.Show.Pretty
@@ -44,6 +43,5 @@ initCompiler = do
       dump_pretty core_pretty_store (cg_binds core)
       dump_raw stg_raw_store stg
       dump_pretty stg_pretty_store stg
-      cmmRaw_list <- Stream.collect cmmRaw
-      dump_raw cmmRaw_raw_store cmmRaw_list
-      dump_pretty cmmRaw_pretty_store cmmRaw_list
+      dump_raw cmmRaw_raw_store cmmRaw
+      dump_pretty cmmRaw_pretty_store cmmRaw
