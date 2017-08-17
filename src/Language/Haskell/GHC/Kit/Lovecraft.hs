@@ -37,8 +37,11 @@ coreProgRHSVars = Set.unions . map coreBindRHSVars
 
 compiler :: Compiler
 compiler =
-  Compiler $ \_ IR {core = CgGuts {..}} -> do
-    let lhs_vars = coreProgLHSVars cg_binds
-        rhs_vars = coreProgRHSVars cg_binds
-    putStrLn $ "Num of Core LHS Vars: " ++ show (Set.size lhs_vars)
-    putStrLn $ "Num of Core RHS Vars: " ++ show (Set.size rhs_vars)
+  defaultCompiler
+  { runCompiler =
+      \_ IR {core = CgGuts {..}} -> do
+        let lhs_vars = coreProgLHSVars cg_binds
+            rhs_vars = coreProgRHSVars cg_binds
+        putStrLn $ "Num of Core LHS Vars: " ++ show (Set.size lhs_vars)
+        putStrLn $ "Num of Core RHS Vars: " ++ show (Set.size rhs_vars)
+  }

@@ -1,51 +1,85 @@
-{-# LANGUAGE RecordWildCards #-}
-
 module Language.Haskell.GHC.Kit.Caliburn
   ( initCompiler
   ) where
 
+import BasicTypes
+import HsSyn
 import HscTypes
 import Language.Haskell.GHC.Kit.Compiler
-import Language.Haskell.GHC.Kit.CompilerStore
 import Language.Haskell.GHC.Kit.LoneWolf ()
-import Outputable
-import System.Directory
-import System.FilePath
-import Text.Show.Pretty
+import RdrName
+import SrcLoc
+import TcEvidence
+
+stripFFIDecl :: HsDecl RdrName -> [HsDecl RdrName]
+stripFFIDecl (ForD ForeignImport { fd_name = loc_name@(L name_loc _)
+                                 , fd_sig_ty = HsIB {hsib_body = loc_ty}
+                                 }) =
+  [ SigD $
+    TypeSig
+      [loc_name]
+      HsWC
+      { hswc_wcs = PlaceHolder
+      , hswc_body =
+          HsIB
+          { hsib_vars = PlaceHolder
+          , hsib_body = loc_ty
+          , hsib_closed = PlaceHolder
+          }
+      }
+  , ValD
+      FunBind
+      { fun_id = loc_name
+      , fun_matches =
+          MG
+          { mg_alts =
+              L
+                name_loc
+                [ L
+                    name_loc
+                    Match
+                    { m_ctxt =
+                        FunRhs
+                        { mc_fun = loc_name
+                        , mc_fixity = Prefix
+                        , mc_strictness = NoSrcStrict
+                        }
+                    , m_pats = []
+                    , m_type = Nothing
+                    , m_grhss =
+                        GRHSs
+                        { grhssGRHSs =
+                            [L name_loc $ GRHS [] $ L name_loc $ HsVar loc_name]
+                        , grhssLocalBinds = L noSrcSpan EmptyLocalBinds
+                        }
+                    }
+                ]
+          , mg_arg_tys = []
+          , mg_res_ty = PlaceHolder
+          , mg_origin = FromSource
+          }
+      , fun_co_fn = WpHole
+      , bind_fvs = PlaceHolder
+      , fun_tick = []
+      }
+  ]
+stripFFIDecl (ForD ForeignExport {}) = []
+stripFFIDecl decl = [decl]
+
+stripFFIModule :: HsParsedModule -> HsParsedModule
+stripFFIModule hpm@HsParsedModule {hpm_module = L src_loc hm@HsModule {hsmodDecls = decls}} =
+  hpm
+  { hpm_module =
+      L
+        src_loc
+        hm
+        { hsmodDecls =
+            [ L orig_src_loc new_decl
+            | L orig_src_loc orig_decl <- decls
+            , new_decl <- stripFFIDecl orig_decl
+            ]
+        }
+  }
 
 initCompiler :: IO Compiler
-initCompiler = do
-  pwd <- getCurrentDirectory
-  let conf =
-        CompilerConfig
-        {topdir = pwd </> ".boot", ext = "txt", rawPut = writeFile}
-  parsed_raw_store <-
-    newCompilerStore conf {topdir = topdir conf </> "raw" </> "parsed"}
-  parsed_pretty_store <-
-    newCompilerStore conf {topdir = topdir conf </> "pretty" </> "parsed"}
-  core_raw_store <-
-    newCompilerStore conf {topdir = topdir conf </> "raw" </> "core"}
-  core_pretty_store <-
-    newCompilerStore conf {topdir = topdir conf </> "pretty" </> "core"}
-  stg_raw_store <-
-    newCompilerStore conf {topdir = topdir conf </> "raw" </> "stg"}
-  stg_pretty_store <-
-    newCompilerStore conf {topdir = topdir conf </> "pretty" </> "stg"}
-  cmmRaw_raw_store <-
-    newCompilerStore conf {topdir = topdir conf </> "raw" </> "cmmRaw"}
-  cmmRaw_pretty_store <-
-    newCompilerStore conf {topdir = topdir conf </> "pretty" </> "cmmRaw"}
-  pure $
-    Compiler $ \ModSummary {..} IR {..} -> do
-      let dump_raw store raw = modulePut store ms_mod (ppShow raw)
-          dump_pretty store pretty =
-            modulePut store ms_mod (showSDocUnsafe $ ppr pretty)
-          hpm = hpm_module parsed
-      dump_raw parsed_raw_store hpm
-      dump_pretty parsed_pretty_store hpm
-      dump_raw core_raw_store core
-      dump_pretty core_pretty_store (cg_binds core)
-      dump_raw stg_raw_store stg
-      dump_pretty stg_pretty_store stg
-      dump_raw cmmRaw_raw_store cmmRaw
-      dump_pretty cmmRaw_pretty_store cmmRaw
+initCompiler = pure $ defaultCompiler {patch = \_ -> pure . stripFFIModule}

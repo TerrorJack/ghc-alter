@@ -4,6 +4,7 @@
 module Language.Haskell.GHC.Kit.Compiler
   ( IR(..)
   , Compiler(..)
+  , defaultCompiler
   , toHooks
   ) where
 
@@ -31,9 +32,13 @@ data IR = IR
   , cmmRaw :: [RawCmmGroup]
   }
 
-newtype Compiler = Compiler
-  { runCompiler :: ModSummary -> IR -> IO ()
+data Compiler = Compiler
+  { patch :: ModSummary -> HsParsedModule -> IO HsParsedModule
+  , runCompiler :: ModSummary -> IR -> IO ()
   }
+
+defaultCompiler :: Compiler
+defaultCompiler = Compiler {patch = const pure, runCompiler = \_ _ -> pure ()}
 
 modifyTVar' :: TVar a -> (a -> a) -> STM ()
 modifyTVar' var f = do
@@ -112,7 +117,15 @@ toHooks Compiler {..} = do
         Just $
         F.genericHscFrontendWith $
         F.defaultFrontend
-        {F.onleave = write_map tc_map_ref, F.parsed = write_map parsed_map_ref}
+        { F.onleave = write_map tc_map_ref
+        , F.parsed =
+            \mod_summary hpm -> do
+              r <- patch mod_summary hpm
+              atomically $
+                modifyTVar' parsed_map_ref $ \m ->
+                  extendModuleEnv m (ms_mod mod_summary) r
+              pure r
+        }
     }
   where
     write_map ref mod_summary x =

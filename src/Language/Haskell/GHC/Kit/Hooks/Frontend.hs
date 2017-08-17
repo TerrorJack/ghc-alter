@@ -21,13 +21,13 @@ import TcRnTypes
 data Frontend = Frontend
   { onenter :: ModSummary -> IO ()
   , onleave :: ModSummary -> TcGblEnv -> IO ()
-  , parsed :: ModSummary -> HsParsedModule -> IO ()
+  , parsed :: ModSummary -> HsParsedModule -> IO HsParsedModule
   }
 
 defaultFrontend :: Frontend
 defaultFrontend =
   Frontend
-  {onenter = \_ -> pure (), onleave = \_ _ -> pure (), parsed = \_ _ -> pure ()}
+  {onenter = \_ -> pure (), onleave = \_ _ -> pure (), parsed = const pure}
 
 hscSimpleIface_ ::
      HscEnv -> TcGblEnv -> Maybe Fingerprint -> IO (ModIface, Bool, ModDetails)
@@ -49,11 +49,11 @@ hscTypecheckWith Frontend {..} keep_rn mod_summary mb_rdr_module = do
   if hsc_src == HsigFile && not (isHoleModule inner_mod)
     then ioMsgMaybe $ tcRnInstantiateSignature hsc_env outer_mod' real_loc
     else do
-      hpm <-
+      hpm' <-
         case mb_rdr_module of
           Just hpm -> return hpm
           Nothing -> hscParse' mod_summary
-      liftIO $ parsed mod_summary hpm
+      hpm <- liftIO $ parsed mod_summary hpm'
       tc_result0 <- tcRnModule' hsc_env mod_summary keep_rn hpm
       if hsc_src == HsigFile
         then do
