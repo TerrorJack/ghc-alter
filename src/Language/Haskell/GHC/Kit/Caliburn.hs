@@ -12,7 +12,7 @@ import SrcLoc
 import TcEvidence
 
 stripFFIDecl :: HsDecl RdrName -> [HsDecl RdrName]
-stripFFIDecl (ForD ForeignImport { fd_name = loc_name@(L name_loc _)
+stripFFIDecl (ForD ForeignImport { fd_name = loc_name
                                  , fd_sig_ty = HsIB {hsib_body = loc_ty}
                                  }) =
   [ SigD $
@@ -34,9 +34,9 @@ stripFFIDecl (ForD ForeignImport { fd_name = loc_name@(L name_loc _)
           MG
           { mg_alts =
               L
-                name_loc
+                noSrcSpan
                 [ L
-                    name_loc
+                    noSrcSpan
                     Match
                     { m_ctxt =
                         FunRhs
@@ -49,7 +49,9 @@ stripFFIDecl (ForD ForeignImport { fd_name = loc_name@(L name_loc _)
                     , m_grhss =
                         GRHSs
                         { grhssGRHSs =
-                            [L name_loc $ GRHS [] $ L name_loc $ HsVar loc_name]
+                            [ L noSrcSpan $
+                              GRHS [] $ L noSrcSpan $ HsVar loc_name
+                            ]
                         , grhssLocalBinds = L noSrcSpan EmptyLocalBinds
                         }
                     }
