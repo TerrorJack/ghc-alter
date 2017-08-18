@@ -16,12 +16,13 @@ module Language.Haskell.GHC.Alter.BuildInfo.Splices
 import Data.Binary
 import Distribution.Simple.Compiler
 import Language.Haskell.TH.Syntax
+import System.FilePath
 
 deriving instance Lift PackageDB
 
 dirQ :: FilePath -> Q Exp
 dirQ k = do
-  s <- qRunIO $ decodeFile $ k ++ ".buildinfo"
+  s <- qRunIO $ decodeFile $ "ghc-alter" </> k <.> "buildinfo"
   lift (s :: FilePath)
 
 bindirQ :: Q Exp
@@ -44,7 +45,7 @@ ghcLibdirQ = dirQ "ghc-libdir"
 
 pkgDbStackQ :: Q Exp
 pkgDbStackQ = do
-  pkgdb <- qRunIO $ decodeFile "pkgdbstack.buildinfo"
+  pkgdb <- qRunIO $ decodeFile $ "ghc-alter" </> "pkgdbstack.buildinfo"
   lift (pkgdb :: PackageDBStack)
 
 pkgNameQ :: Q Exp
