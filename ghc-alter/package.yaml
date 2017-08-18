@@ -35,6 +35,9 @@ dependencies:
   - directory
   - filepath
   - ghc == 8.2.1
+  - ghc-alter-print-ir
+  - ghc-alter-store
+  - ghc-alter-with-ir
   - hoopl
   - process
   - template-haskell

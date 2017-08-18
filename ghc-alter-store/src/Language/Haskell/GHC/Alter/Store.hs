@@ -1,7 +1,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE StrictData #-}
 
-module Language.Haskell.GHC.Alter.CompilerStore
+module Language.Haskell.GHC.Alter.Store
   ( CompilerConfig(..)
   , CompilerStore(..)
   , newCompilerStore

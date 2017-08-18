@@ -1,6 +1,6 @@
 .stack-work/
 *.buildinfo
-ghc-alter.cabal
+ghc-alter*.cabal
 Setup
 Setup.hi
 Setup.o

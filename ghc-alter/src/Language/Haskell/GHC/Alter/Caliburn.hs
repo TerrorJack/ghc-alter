@@ -6,7 +6,6 @@ import BasicTypes
 import HsSyn
 import HscTypes
 import Language.Haskell.GHC.Alter.Compiler
-import Language.Haskell.GHC.Alter.LoneWolf ()
 import RdrName
 import SrcLoc
 import TcEvidence

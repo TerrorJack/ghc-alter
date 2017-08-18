@@ -1,0 +1,23 @@
+name: ghc-alter-with-ir
+version: 0.0.1
+category: Compiler
+synopsis: Extract IRs from ghc pipeline.
+stability: alpha
+maintainer: Shao Cheng <astrohavoc@gmail.com>
+copyright: (c) 2017 Shao Cheng
+license: BSD3
+github: TerrorJack/ghc-alter
+
+extra-source-files:
+  - LICENSE
+  - README.md
+  - CHANGELOG.md
+
+ghc-options: -Wall
+
+dependencies:
+  - base >= 4.10 && < 5
+  - ghc == 8.2.1
+
+library:
+  source-dirs: src

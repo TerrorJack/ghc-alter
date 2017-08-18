@@ -1,0 +1,24 @@
+name: ghc-alter-print-ir
+version: 0.0.1
+category: Compiler
+synopsis: Orphan Show instances for various ghc IR types.
+stability: alpha
+maintainer: Shao Cheng <astrohavoc@gmail.com>
+copyright: (c) 2017 Shao Cheng
+license: BSD3
+github: TerrorJack/ghc-alter
+
+extra-source-files:
+  - LICENSE
+  - README.md
+  - CHANGELOG.md
+
+ghc-options: -Wall
+
+dependencies:
+  - base >= 4.10 && < 5
+  - ghc == 8.2.1
+  - hoopl
+
+library:
+  source-dirs: src
