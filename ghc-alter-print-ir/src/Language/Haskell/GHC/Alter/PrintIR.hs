@@ -722,6 +722,26 @@ deriving instance Show (HsDecl RdrName)
 
 deriving instance Show (HsModule RdrName)
 
+deriving instance Show (IEWrappedName Id)
+
+deriving instance Show (FieldLbl Id)
+
+deriving instance Show (IE Id)
+
+deriving instance Show (ImportDecl Id)
+
+deriving instance Show (HsModule Id)
+
+deriving instance Show (IEWrappedName Name)
+
+deriving instance Show (FieldLbl Name)
+
+deriving instance Show (IE Name)
+
+deriving instance Show (ImportDecl Name)
+
+deriving instance Show (HsModule Name)
+
 deriving instance Show SptEntry
 
 instance Show ModBreaks where
