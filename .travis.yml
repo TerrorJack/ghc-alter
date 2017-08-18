@@ -57,13 +57,13 @@ script:
   - stack --no-terminal test ghc-alter:ghc-alter-boot
 
   - |
-    if [ `uname` = "Linux" ]
+    if [ `uname` = "Linux" ] && [ $TRAVIS_REPO_SLUG == "TerrorJack/ghc-alter" ]
     then
       cd `stack path --local-doc-root`
       touch .nojekyll
       git init
       git checkout -b gh-pages
       git add --all
-      git commit --message="Initial commit"
+      git commit --message="Auto-generated haddock documentation of commit $TRAVIS_COMMIT"
       git push https://TerrorJack:$GITHUB_ACCESS_TOKEN@github.com/TerrorJack/ghc-alter.git gh-pages --force
     fi
