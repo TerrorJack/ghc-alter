@@ -34,12 +34,11 @@ before_install:
     fi
 
 install:
-  - stack --no-terminal build --test --no-run-tests --haddock --haddock-deps
-
-script:
+  - stack --no-terminal --install-ghc build --test --no-run-tests --haddock --haddock-deps
   - stack --no-terminal test ghc-alter:compile-fact
   - stack --no-terminal test ghc-alter:ghc-alter-boot
 
+script:
   - |
     if [ `uname` = "Linux" ] && [ $TRAVIS_REPO_SLUG == "TerrorJack/ghc-alter" ]
     then

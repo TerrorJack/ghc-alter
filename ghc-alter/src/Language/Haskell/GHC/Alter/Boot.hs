@@ -64,6 +64,10 @@ boot bt@BootTask {..} = do
   createDirectoryIfMissing True pkgDb
   callProcess ghcPkg ["--package-db", pkgDb, "recache"]
   withCurrentDirectory bootlibdir $ do
-    bootLib bt {bootlibdir = "ghc-prim"}
+    bootLib
+      bt
+      { bootlibdir = "ghc-prim"
+      , confOpts = "--gcc-option=-Wno-sync-nand" : confOpts
+      }
     bootLib bt {bootlibdir = "integer-gmp"}
     bootLib bt {bootlibdir = "base", confOpts = "-finteger-gmp" : confOpts}
