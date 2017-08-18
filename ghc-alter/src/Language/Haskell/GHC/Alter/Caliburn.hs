@@ -1,6 +1,4 @@
-module Language.Haskell.GHC.Alter.Caliburn
-  ( initCompiler
-  ) where
+module Language.Haskell.GHC.Alter.Caliburn where
 
 import BasicTypes
 import HsSyn
@@ -82,5 +80,9 @@ stripFFIModule hpm@HsParsedModule {hpm_module = L src_loc hm@HsModule {hsmodDecl
         }
   }
 
+initStripFFICompiler :: IO Compiler
+initStripFFICompiler =
+  pure $ defaultCompiler {patch = \_ -> pure . stripFFIModule}
+
 initCompiler :: IO Compiler
-initCompiler = pure $ defaultCompiler {patch = \_ -> pure . stripFFIModule}
+initCompiler = pure defaultCompiler

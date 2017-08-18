@@ -8,6 +8,9 @@ copyright: (c) 2017 Shao Cheng
 license: BSD3
 github: TerrorJack/ghc-alter
 
+data-files:
+  - boot-lib/**/*
+
 extra-source-files:
   - LICENSE
   - README.md
@@ -27,13 +30,13 @@ other-extensions:
 ghc-options: -Wall
 
 dependencies:
-  - base >= 4.10 && < 5
+  - base
   - binary
-  - Cabal == 2.0.0.2
+  - Cabal
   - containers
   - directory
   - filepath
-  - ghc == 8.2.1
+  - ghc
   - ghc-alter-print-ir
   - ghc-alter-store
   - ghc-alter-with-ir
@@ -44,9 +47,9 @@ dependencies:
 
 custom-setup:
   dependencies:
-    - base >= 4.10 && < 5
+    - base
     - binary
-    - Cabal == 2.0.0.2
+    - Cabal
     - filepath
 
 library:

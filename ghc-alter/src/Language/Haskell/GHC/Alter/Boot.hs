@@ -19,19 +19,17 @@ data BootTask = BootTask
   , ghcOpts, confOpts :: [String]
   }
 
-defaultBootTask :: IO BootTask
-defaultBootTask = do
-  pwd <- getCurrentDirectory
-  pure
-    BootTask
-    { bootlibdir = pwd </> "boot-lib"
-    , topdir = pwd </> ".boot"
-    , pkgDb = pwd </> ".boot" </> "package.conf.d"
-    , ghc = P.ghc
-    , ghcPkg = P.ghcPkg
-    , ghcOpts = []
-    , confOpts = []
-    }
+defaultBootTask :: BootTask
+defaultBootTask =
+  BootTask
+  { bootlibdir = P.datadir </> "boot-lib"
+  , topdir = P.datadir </> ".boot"
+  , pkgDb = P.datadir </> ".boot" </> "package.conf.d"
+  , ghc = P.ghc
+  , ghcPkg = P.ghcPkg
+  , ghcOpts = []
+  , confOpts = []
+  }
 
 bootLib :: BootTask -> IO ()
 bootLib BootTask {..} = do
@@ -69,8 +67,3 @@ boot bt@BootTask {..} = do
     bootLib bt {bootlibdir = "ghc-prim"}
     bootLib bt {bootlibdir = "integer-gmp"}
     bootLib bt {bootlibdir = "base", confOpts = "-finteger-gmp" : confOpts}
-    bootLib bt {bootlibdir = "ghc-boot-th"}
-    bootLib bt {bootlibdir = "array"}
-    bootLib bt {bootlibdir = "deepseq"}
-    bootLib bt {bootlibdir = "pretty"}
-    bootLib bt {bootlibdir = "template-haskell"}

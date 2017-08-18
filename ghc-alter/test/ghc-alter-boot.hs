@@ -5,6 +5,4 @@ module Main
 import Language.Haskell.GHC.Alter.Boot
 
 main :: IO ()
-main = do
-  t <- defaultBootTask
-  boot $ t {ghc = "ghc-wrapper"}
+main = boot $ defaultBootTask {ghc = "ghc-wrapper"}

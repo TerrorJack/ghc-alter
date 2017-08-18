@@ -6,7 +6,7 @@ license-file:        LICENSE
 author:              Herbert Valerio Riedel
 maintainer:          hvr@gnu.org
 category:            Numeric, Algebra
-build-type:          Simple
+build-type:          Configure
 cabal-version:       >=1.10
 
 extra-source-files:
@@ -49,8 +49,11 @@ library
   build-depends:       ghc-prim
   hs-source-dirs:      src/
   ghc-options: -this-unit-id integer-gmp -Wall
+  cc-options: -std=c99 -Wall
 
   include-dirs: include
+  c-sources:
+    cbits/wrappers.c
 
   exposed-modules:
     GHC.Integer

@@ -321,6 +321,19 @@ Library
         System.Environment.ExecutablePath
         System.CPUTime.Utils
 
+    c-sources:
+        cbits/DarwinUtils.c
+        cbits/PrelIOUtils.c
+        cbits/SetEnv.c
+        cbits/WCsubst.c
+        cbits/Win32Utils.c
+        cbits/consUtils.c
+        cbits/iconv.c
+        cbits/inputReady.c
+        cbits/md5.c
+        cbits/primFloat.c
+        cbits/sysconf.c
+
     include-dirs: include
     includes:
         HsBase.h
@@ -339,6 +352,7 @@ Library
         -- mingw32: Unfortunately required because of a resource leak between
         --          mingwex and mingw32. the __math_err symbol is defined in
         --          mingw32 which is required by mingwex.
+        extra-libraries: wsock32, user32, shell32, msvcrt, mingw32, mingwex
         exposed-modules:
             GHC.IO.Encoding.CodePage.API
             GHC.IO.Encoding.CodePage.Table
