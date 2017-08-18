@@ -15,25 +15,25 @@ import Distribution.Simple.Compiler
 import Language.Haskell.GHC.Alter.BuildInfo.Splices
 
 bindir :: FilePath
-bindir = $(bindirQ)
+bindir = $$(bindirQ)
 
 libdir :: FilePath
-libdir = $(libdirQ)
+libdir = $$(libdirQ)
 
 datadir :: FilePath
-datadir = $(datadirQ)
+datadir = $$(datadirQ)
 
 ghc :: FilePath
-ghc = $(ghcQ)
+ghc = $$(ghcQ)
 
 ghcPkg :: FilePath
-ghcPkg = $(ghcPkgQ)
+ghcPkg = $$(ghcPkgQ)
 
 ghcLibdir :: FilePath
-ghcLibdir = $(ghcLibdirQ)
+ghcLibdir = $$(ghcLibdirQ)
 
 pkgDbStack :: PackageDBStack
-pkgDbStack = $(pkgDbStackQ)
+pkgDbStack = $$(pkgDbStackQ)
 
 pkgName :: String
-pkgName = $(pkgNameQ)
+pkgName = $$(pkgNameQ)
