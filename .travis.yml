@@ -6,7 +6,6 @@ git:
 cache:
   directories:
     - $HOME/.stack/
-    - $TRAVIS_BUILD_DIR/.stack-work/
 
 matrix:
   include:
@@ -34,9 +33,12 @@ before_install:
     fi
   - stack --no-terminal --install-ghc build --test --no-run-tests --only-dependencies
 
-install: true
+install:
+  - stack --no-terminal build --test --no-run-tests
 
 script:
+  - cd ghc-alter
+
   - cd boot-lib
 
   - cd integer-gmp
@@ -45,6 +47,8 @@ script:
 
   - cd base
   - autoreconf -i
+  - cd ..
+
   - cd ..
 
   - cd ..
