@@ -1,4 +1,4 @@
-name: ghc-kit
+name: ghc-alter
 version: 0.0.1
 category: Compiler
 synopsis: Utilities for building Haskell tooling with ghc.
@@ -6,7 +6,7 @@ stability: alpha
 maintainer: Shao Cheng <astrohavoc@gmail.com>
 copyright: (c) 2017 Shao Cheng
 license: BSD3
-github: TerrorJack/ghc-kit
+github: TerrorJack/ghc-alter
 
 extra-source-files:
   - LICENSE
@@ -28,13 +28,13 @@ other-extensions:
 ghc-options: -Wall
 
 dependencies:
-  - base >= 4.9 && < 5
+  - base >= 4.10 && < 5
   - binary
-  - Cabal
+  - Cabal == 2.0.0.2
   - containers
   - directory
   - filepath
-  - ghc
+  - ghc == 8.2.1
   - hoopl
   - process
   - template-haskell
@@ -42,9 +42,9 @@ dependencies:
 
 custom-setup:
   dependencies:
-    - base
+    - base >= 4.10 && < 5
     - binary
-    - Cabal
+    - Cabal == 2.0.0.2
 
 library:
   source-dirs: src
@@ -54,17 +54,17 @@ executables:
     source-dirs: app
     main: ghc-wrapper.hs
     dependencies:
-      - ghc-kit
+      - ghc-alter
 
 tests:
-  ghc-kit-boot:
+  ghc-alter-boot:
     source-dirs: test
-    main: ghc-kit-boot.hs
+    main: ghc-alter-boot.hs
     dependencies:
-      - ghc-kit
+      - ghc-alter
   
   compile-fact:
     source-dirs: test
     main: compile-fact.hs
     dependencies:
-      - ghc-kit
+      - ghc-alter

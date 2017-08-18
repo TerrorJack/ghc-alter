@@ -1,7 +1,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE StrictData #-}
 
-module Language.Haskell.GHC.Kit.Compiler
+module Language.Haskell.GHC.Alter.Compiler
   ( IR(..)
   , Compiler(..)
   , defaultCompiler
@@ -15,8 +15,8 @@ import DriverPipeline
 import GHC.Conc
 import Hooks
 import HscTypes
-import qualified Language.Haskell.GHC.Kit.Hooks.Frontend as F
-import qualified Language.Haskell.GHC.Kit.Hooks.RunPhase as RP
+import qualified Language.Haskell.GHC.Alter.Hooks.Frontend as F
+import qualified Language.Haskell.GHC.Alter.Hooks.RunPhase as RP
 import Module
 import StgSyn
 import qualified Stream

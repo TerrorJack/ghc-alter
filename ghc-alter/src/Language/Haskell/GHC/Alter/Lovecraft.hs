@@ -1,13 +1,13 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE RecordWildCards #-}
 
-module Language.Haskell.GHC.Kit.Lovecraft where
+module Language.Haskell.GHC.Alter.Lovecraft where
 
 import CoreSyn
 import Data.Data (Data(..))
 import qualified Data.Set as Set
 import HscTypes
-import Language.Haskell.GHC.Kit.Compiler
+import Language.Haskell.GHC.Alter.Compiler
 import Type.Reflection
        ((:~~:)(..), TypeRep, eqTypeRep, typeOf, typeRep)
 import Var

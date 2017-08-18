@@ -2,7 +2,7 @@ module Main
   ( main
   ) where
 
-import Language.Haskell.GHC.Kit.Boot
+import Language.Haskell.GHC.Alter.Boot
 
 main :: IO ()
 main = do

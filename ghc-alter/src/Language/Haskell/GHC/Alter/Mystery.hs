@@ -1,11 +1,11 @@
 {-# LANGUAGE RecordWildCards #-}
 
-module Language.Haskell.GHC.Kit.Mystery where
+module Language.Haskell.GHC.Alter.Mystery where
 
 import Control.Monad
 import Data.Foldable
 import qualified Data.Set as Set
-import Language.Haskell.GHC.Kit.Compiler
+import Language.Haskell.GHC.Alter.Compiler
 import Name
 import Outputable
 import StgSyn

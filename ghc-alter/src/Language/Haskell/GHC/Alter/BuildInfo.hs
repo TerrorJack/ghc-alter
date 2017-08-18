@@ -1,6 +1,6 @@
 {-# LANGUAGE TemplateHaskell #-}
 
-module Language.Haskell.GHC.Kit.BuildInfo
+module Language.Haskell.GHC.Alter.BuildInfo
   ( bindir
   , libdir
   , datadir
@@ -12,7 +12,7 @@ module Language.Haskell.GHC.Kit.BuildInfo
   ) where
 
 import Distribution.Simple.Compiler
-import Language.Haskell.GHC.Kit.BuildInfo.Splices
+import Language.Haskell.GHC.Alter.BuildInfo.Splices
 
 bindir :: FilePath
 bindir = $(bindirQ)

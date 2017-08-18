@@ -1,10 +1,10 @@
 .stack-work/
 *.buildinfo
-ghc-kit.cabal
+ghc-alter.cabal
 Setup
 Setup.hi
 Setup.o
 .boot/
 *.hi
 *.o
-test/fact/fact
+ghc-alter/test/fact/fact

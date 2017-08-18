@@ -1,13 +1,13 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE StrictData #-}
 
-module Language.Haskell.GHC.Kit.GHCWrapper
+module Language.Haskell.GHC.Alter.GHCWrapper
   ( WrapperOptions(..)
   , wrapperMain
   ) where
 
 import Distribution.Simple.Compiler
-import Language.Haskell.GHC.Kit.BuildInfo
+import Language.Haskell.GHC.Alter.BuildInfo
 import System.Environment
 import System.Process
 

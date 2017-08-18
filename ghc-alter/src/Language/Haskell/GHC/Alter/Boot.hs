@@ -1,7 +1,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE StrictData #-}
 
-module Language.Haskell.GHC.Kit.Boot
+module Language.Haskell.GHC.Alter.Boot
   ( BootTask(..)
   , defaultBootTask
   , bootLib
@@ -9,7 +9,7 @@ module Language.Haskell.GHC.Kit.Boot
   ) where
 
 import Control.Monad
-import qualified Language.Haskell.GHC.Kit.BuildInfo as P
+import qualified Language.Haskell.GHC.Alter.BuildInfo as P
 import System.Directory
 import System.Environment
 import System.FilePath

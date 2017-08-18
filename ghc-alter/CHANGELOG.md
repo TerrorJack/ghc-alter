@@ -1,4 +1,4 @@
-# CHANGELOG for ghc-kit
+# CHANGELOG for ghc-alter
 
 ## Pre-0.0.1
 

@@ -2,7 +2,7 @@
 {-# LANGUAGE StandaloneDeriving #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
-module Language.Haskell.GHC.Kit.BuildInfo.Splices
+module Language.Haskell.GHC.Alter.BuildInfo.Splices
   ( bindirQ
   , libdirQ
   , datadirQ

@@ -1,6 +1,6 @@
 {-# LANGUAGE StrictData #-}
 
-module Language.Haskell.GHC.Kit.FrontendPlugin
+module Language.Haskell.GHC.Alter.FrontendPlugin
   ( frontendPlugin
   ) where
 
@@ -9,8 +9,8 @@ import Control.Monad.IO.Class
 import GHC
 import GhcPlugins
 import Hooks
-import Language.Haskell.GHC.Kit.Caliburn
-import Language.Haskell.GHC.Kit.Compiler
+import Language.Haskell.GHC.Alter.Caliburn
+import Language.Haskell.GHC.Alter.Compiler
 
 frontendAction :: [String] -> [(String, Maybe Phase)] -> Ghc ()
 frontendAction args targets = do

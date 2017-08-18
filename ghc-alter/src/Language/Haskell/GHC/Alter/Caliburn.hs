@@ -1,12 +1,12 @@
-module Language.Haskell.GHC.Kit.Caliburn
+module Language.Haskell.GHC.Alter.Caliburn
   ( initCompiler
   ) where
 
 import BasicTypes
 import HsSyn
 import HscTypes
-import Language.Haskell.GHC.Kit.Compiler
-import Language.Haskell.GHC.Kit.LoneWolf ()
+import Language.Haskell.GHC.Alter.Compiler
+import Language.Haskell.GHC.Alter.LoneWolf ()
 import RdrName
 import SrcLoc
 import TcEvidence

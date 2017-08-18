@@ -2,7 +2,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE StrictData #-}
 
-module Language.Haskell.GHC.Kit.Hooks.RunPhase
+module Language.Haskell.GHC.Alter.Hooks.RunPhase
   ( RunPhase(..)
   , defaultRunPhase
   , runPhaseWith

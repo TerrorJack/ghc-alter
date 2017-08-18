@@ -1,7 +1,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE StrictData #-}
 
-module Language.Haskell.GHC.Kit.Hooks.Frontend
+module Language.Haskell.GHC.Alter.Hooks.Frontend
   ( Frontend(..)
   , defaultFrontend
   , genericHscFrontendWith

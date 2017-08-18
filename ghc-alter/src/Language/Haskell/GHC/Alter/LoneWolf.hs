@@ -4,7 +4,7 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
-module Language.Haskell.GHC.Kit.LoneWolf
+module Language.Haskell.GHC.Alter.LoneWolf
   (
   ) where
 
