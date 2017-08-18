@@ -22,7 +22,6 @@ other-extensions:
   - NamedFieldPuns
   - RecordWildCards
   - StandaloneDeriving
-  - StrictData
   - TemplateHaskell
 
 ghc-options: -Wall

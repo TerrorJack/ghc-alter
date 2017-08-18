@@ -1,5 +1,3 @@
-{-# LANGUAGE StrictData #-}
-
 module Language.Haskell.GHC.Alter.FrontendPlugin
   ( frontendPlugin
   ) where

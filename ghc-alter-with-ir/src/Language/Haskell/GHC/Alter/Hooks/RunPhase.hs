@@ -1,6 +1,5 @@
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE StrictData #-}
 
 module Language.Haskell.GHC.Alter.Hooks.RunPhase
   ( RunPhase(..)

@@ -1,5 +1,4 @@
 {-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE StrictData #-}
 
 module Language.Haskell.GHC.Alter.Hooks.Frontend
   ( Frontend(..)

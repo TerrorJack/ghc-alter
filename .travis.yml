@@ -16,6 +16,7 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
+            - git-core
 
     - os: osx
       osx_image: xcode9
@@ -31,10 +32,10 @@ before_install:
     else
       travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
     fi
-  - stack --no-terminal --install-ghc build --test --no-run-tests --only-dependencies
+  - stack --no-terminal --install-ghc build --test --no-run-tests --haddock --haddock-deps --only-dependencies
 
 install:
-  - stack --no-terminal build --test --no-run-tests
+  - stack --no-terminal build --test --no-run-tests --haddock --haddock-deps
 
 script:
   - cd ghc-alter
@@ -54,3 +55,15 @@ script:
   - cd ..
   
   - stack --no-terminal test
+
+  - |
+    if [ `uname` = "Linux" ]
+    then
+      cd `stack path --local-doc-root`
+      touch .nojekyll
+      git init
+      git checkout -b gh-pages
+      git add --all
+      git commit --message="Initial commit"
+      git push https://TerrorJack:$GITHUB_ACCESS_TOKEN@github.com/TerrorJack/ghc-alter.git gh-pages --force
+    fi
