@@ -7,4 +7,4 @@ import Language.Haskell.GHC.Alter.Boot
 main :: IO ()
 main = do
   t <- defaultBootTask
-  boot $ t {ghc = "ghc-wrapper", confOpts = ["-O2"]}
+  boot $ t {ghc = "ghc-wrapper"}

@@ -32,7 +32,6 @@ before_install:
     else
       travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
     fi
-  - stack --no-terminal --install-ghc build --test --no-run-tests --haddock --haddock-deps --only-dependencies
 
 install:
   - stack --no-terminal build --test --no-run-tests --haddock --haddock-deps
@@ -54,7 +53,8 @@ script:
 
   - cd ..
   
-  - stack --no-terminal test
+  - stack --no-terminal test ghc-alter:compile-fact
+  - stack --no-terminal test ghc-alter:ghc-alter-boot
 
   - |
     if [ `uname` = "Linux" ]
