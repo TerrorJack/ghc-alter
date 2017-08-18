@@ -45,6 +45,7 @@ custom-setup:
     - base >= 4.10 && < 5
     - binary
     - Cabal == 2.0.0.2
+    - filepath
 
 library:
   source-dirs: src

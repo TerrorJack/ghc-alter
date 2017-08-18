@@ -14,6 +14,7 @@ import Distribution.Simple.LocalBuildInfo
 import Distribution.Simple.Program
 import Distribution.Simple.Setup
 import Distribution.Types.PackageDescription
+import System.FilePath
 
 main :: IO ()
 main =
@@ -22,7 +23,7 @@ main =
     { postConf =
         \_args flags pkg_descr lbi -> do
           let installdirs = absoluteInstallDirs pkg_descr lbi NoCopyDest
-          let dump k = encodeFile (k ++ ".buildinfo")
+          let dump k = encodeFile $ k <.> "buildinfo"
           for_ [("bindir", bindir), ("libdir", libdir), ("datadir", datadir)] $ \(k, v) ->
             dump k $ v installdirs
           let conf p = fromJust $ lookupProgram p $ withPrograms lbi
