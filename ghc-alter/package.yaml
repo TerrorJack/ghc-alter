@@ -19,14 +19,6 @@ extra-source-files:
   - test/fact/fact.hs
   - test/fact/FactFunc.hs
 
-other-extensions:
-  - DeriveLift
-  - GADTs
-  - NamedFieldPuns
-  - RecordWildCards
-  - StandaloneDeriving
-  - TemplateHaskell
-
 ghc-options: -Wall
 
 dependencies:
@@ -54,6 +46,12 @@ custom-setup:
 
 library:
   source-dirs: src
+  other-extensions:
+    - DeriveLift
+    - MagicHash
+    - RecordWildCards
+    - StandaloneDeriving
+    - TemplateHaskell
 
 executables:
   ghc-wrapper:

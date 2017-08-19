@@ -8,6 +8,8 @@
 * [`ghc-alter-store`](ghc-alter-store/): A simple object file store. Useful for compiling Haskell sources to custom object formats.
 * [`ghc-alter-with-ir`](ghc-alter-with-ir/): Extract IRs from ghc pipeline for custom compilation, with support for patching parsed modules.
 
+ghc 8.2.1 is required.
+
 ## Documentation
 
 [Auto-generated haddock documentation](https://terrorjack.github.io/ghc-alter/)
