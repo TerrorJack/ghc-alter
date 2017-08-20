@@ -39,8 +39,12 @@ install:
   - cd ../base
   - autoreconf -i
   - cd $TRAVIS_BUILD_DIR
-  - stack --no-terminal --install-ghc build --test --no-run-tests --haddock --haddock-deps
-  - cd `stack path --local-install-root`/share
+  - stack --no-terminal setup
+  - curl -L https://github.com/TerrorJack/ghc-doc/archive/gh-pages.zip -o ghc-doc.zip
+  - unzip ghc-doc.zip
+  - mv ghc-doc-gh-pages html
+  - cp -r html `stack path --programs`/ghc-8.2.1/share/doc/ghc-8.2.1/
+  - stack --no-terminal build --test --no-run-tests --haddock --haddock-deps
   - stack --no-terminal test ghc-alter:compile-fact
   - stack --no-terminal test ghc-alter:ghc-alter-boot
 
