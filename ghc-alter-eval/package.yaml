@@ -1,0 +1,25 @@
+name: ghc-alter-eval
+version: 0.0.1
+category: Compiler
+synopsis: Evaluate expressions at runtime.
+stability: alpha
+maintainer: Shao Cheng <astrohavoc@gmail.com>
+copyright: (c) 2017 Shao Cheng
+license: BSD3
+github: TerrorJack/ghc-alter
+
+extra-source-files:
+  - LICENSE
+  - README.md
+  - CHANGELOG.md
+
+ghc-options: -Wall
+
+dependencies:
+  - base
+  - ghc
+  - ghci
+  - ghc-alter
+
+library:
+  source-dirs: src

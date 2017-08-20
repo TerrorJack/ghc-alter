@@ -4,6 +4,7 @@
 
 `ghc-alter` is a set of libraries to ease the development of custom Haskell compilers on top of ghc. Currently contains:
 
+* [`ghc-alter-eval`](ghc-alter-eval): Evaluate expressions at runtime.
 * [`ghc-alter-print-ir`](ghc-alter-print-ir/): Orphan `Show` instances for various ghc IR types. Useful for debugging & studying ghc internals.
 * [`ghc-alter-store`](ghc-alter-store/): A simple object file store. Useful for compiling Haskell sources to custom object formats.
 * [`ghc-alter-with-ir`](ghc-alter-with-ir/): Extract IRs from ghc pipeline for custom compilation, with support for patching parsed modules.
