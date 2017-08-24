@@ -17,7 +17,6 @@ ghc-options: -Wall
 
 dependencies:
   - base
-  - Cabal
   - ghc
 
 library:
