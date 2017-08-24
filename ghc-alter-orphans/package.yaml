@@ -1,4 +1,4 @@
-name: ghc-alter-print-ir
+name: ghc-alter-orphans
 version: 0.0.1
 category: Compiler
 synopsis: Orphan Show instances for various ghc IR types.
@@ -17,6 +17,7 @@ ghc-options: -Wall
 
 dependencies:
   - base
+  - binary
   - ghc
   - hoopl
 

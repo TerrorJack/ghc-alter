@@ -4,7 +4,7 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
-module Language.Haskell.GHC.Alter.PrintIR
+module Language.Haskell.GHC.Alter.Orphans.Show
   (
   ) where
 

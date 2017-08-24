@@ -1,7 +1,7 @@
-resolver: nightly-2017-08-17
+resolver: nightly-2017-08-20
 packages:
   - ghc-alter
   - ghc-alter-eval
-  - ghc-alter-print-ir
+  - ghc-alter-orphans
   - ghc-alter-store
   - ghc-alter-with-ir

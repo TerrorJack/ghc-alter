@@ -29,7 +29,7 @@ dependencies:
   - directory
   - filepath
   - ghc
-  - ghc-alter-print-ir
+  - ghc-alter-orphans
   - ghc-alter-store
   - ghc-alter-with-ir
   - hoopl
