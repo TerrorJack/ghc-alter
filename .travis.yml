@@ -10,13 +10,14 @@ cache:
 matrix:
   include:
     - os: linux
-      dist: trusty
       sudo: false
+      dist: trusty
+      group: edge
       addons:
         apt:
           sources:
-            - ubuntu-toolchain-r-test
             - git-core
+            - ubuntu-toolchain-r-test
 
     - os: osx
       osx_image: xcode9
