@@ -1,7 +1,7 @@
 name: ghc-alter-eval
 version: 0.0.1
 category: Compiler
-synopsis: Evaluate expressions at runtime.
+synopsis: Import values at runtime.
 stability: alpha
 maintainer: Shao Cheng <astrohavoc@gmail.com>
 copyright: (c) 2017 Shao Cheng

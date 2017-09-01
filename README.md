@@ -4,7 +4,7 @@
 
 `ghc-alter` is a set of libraries to ease the development of custom Haskell compilers on top of ghc. Currently contains:
 
-* [`ghc-alter-eval`](ghc-alter-eval): Evaluate expressions at runtime.
+* [`ghc-alter-eval`](ghc-alter-eval): Import values at runtime.
 * [`ghc-alter-buildinfo`](ghc-alter-buildinfo): Obtain build info of current package.
 * [`ghc-alter-frontend`](ghc-alter-frontend): Utils for building ghc frontend plugins.
 * [`ghc-alter-orphans`](ghc-alter-orphans): Orphan `Show` instances for various ghc IR types. Useful for debugging & studying ghc internals.

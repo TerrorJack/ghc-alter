@@ -1,3 +1,3 @@
 # ghc-alter-eval
 
-Evaluate expressions at runtime.
+Import values at runtime.
