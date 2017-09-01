@@ -1,6 +1,7 @@
-resolver: nightly-2017-08-20
+resolver: nightly-2017-09-01
 packages:
   - ghc-alter
+  - ghc-alter-buildinfo
   - ghc-alter-eval
   - ghc-alter-frontend
   - ghc-alter-orphans

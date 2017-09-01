@@ -1,0 +1,26 @@
+name: ghc-alter-buildinfo
+version: 0.0.1
+category: Compiler
+synopsis: Obtain build info of current package.
+stability: alpha
+maintainer: Shao Cheng <astrohavoc@gmail.com>
+copyright: (c) 2017 Shao Cheng
+license: BSD3
+github: TerrorJack/ghc-alter
+
+extra-source-files:
+  - LICENSE
+  - README.md
+  - CHANGELOG.md
+
+ghc-options: -Wall
+
+dependencies:
+  - base
+  - binary
+  - bytestring
+  - Cabal
+  - template-haskell
+
+library:
+  source-dirs: src
