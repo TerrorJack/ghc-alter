@@ -8,7 +8,7 @@ import DynFlags
 import GHC
 import GHC.Exts
 import GHC.IO (evaluate)
-import Language.Haskell.GHC.Alter.BuildInfo
+import Language.Haskell.GHC.Alter.Eval.Internals
 
 unsafeEval :: GhcMonad m => String -> m a
 unsafeEval expr = do
@@ -18,7 +18,7 @@ unsafeEval expr = do
 unsafeEvalIO :: [ModuleName] -> String -> IO a
 unsafeEvalIO mod_names expr =
   defaultErrorHandler defaultFatalMessager defaultFlushOut $
-  runGhc (Just ghcLibdir) $ do
+  runGhc (Just ghcLibDir) $ do
     dflags <- getSessionDynFlags
     void $ setSessionDynFlags dflags
     setContext [IIDecl $ simpleImportDecl mod_name | mod_name <- mod_names]
