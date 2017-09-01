@@ -11,8 +11,12 @@ module Language.Haskell.GHC.Alter.BuildInfo
   , pkgName
   ) where
 
-import Distribution.Simple.Compiler
-import Language.Haskell.GHC.Alter.BuildInfo.Splices
+import qualified Distribution.Simple.Compiler as Cabal
+import qualified Distribution.Simple.Program as Cabal
+import qualified Distribution.Types.PackageDescription as Cabal
+import qualified Distribution.Types.PackageId as Cabal
+import qualified Distribution.Types.PackageName as Cabal
+import Language.Haskell.GHC.Alter.BuildInfo.TypedSplices
 
 bindir :: FilePath
 bindir = $$(bindirQ)
@@ -24,16 +28,16 @@ datadir :: FilePath
 datadir = $$(datadirQ)
 
 ghc :: FilePath
-ghc = $$(ghcQ)
+ghc = Cabal.programPath $$(ghcQ)
 
 ghcPkg :: FilePath
-ghcPkg = $$(ghcPkgQ)
+ghcPkg = Cabal.programPath $$(ghcPkgQ)
 
 ghcLibdir :: FilePath
-ghcLibdir = $$(ghcLibdirQ)
+ghcLibdir = $$(ghcLibDirQ)
 
-pkgDbStack :: PackageDBStack
-pkgDbStack = $$(pkgDbStackQ)
+pkgDbStack :: Cabal.PackageDBStack
+pkgDbStack = $$(packageDbStackQ)
 
 pkgName :: String
-pkgName = $$(pkgNameQ)
+pkgName = Cabal.unPackageName $ Cabal.pkgName $ Cabal.package $$(packageDescriptionQ)

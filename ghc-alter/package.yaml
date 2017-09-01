@@ -29,6 +29,7 @@ dependencies:
   - directory
   - filepath
   - ghc
+  - ghc-alter-buildinfo
   - ghc-alter-orphans
   - ghc-alter-store
   - ghc-alter-with-ir
@@ -40,9 +41,8 @@ dependencies:
 custom-setup:
   dependencies:
     - base
-    - binary
     - Cabal
-    - filepath
+    - ghc-alter-buildinfo
 
 library:
   source-dirs: src
@@ -66,7 +66,7 @@ tests:
     main: ghc-alter-boot.hs
     dependencies:
       - ghc-alter
-  
+
   compile-fact:
     source-dirs: test
     main: compile-fact.hs
