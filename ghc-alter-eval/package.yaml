@@ -15,12 +15,6 @@ extra-source-files:
 
 ghc-options: -Wall
 
-custom-setup:
-  dependencies:
-    - base
-    - Cabal
-    - ghc-alter-buildinfo
-
 dependencies:
   - base
   - ghc
@@ -29,8 +23,5 @@ dependencies:
 
 library:
   source-dirs: src
-  other-modules:
-    - Language.Haskell.GHC.Alter.Eval.Internals
   other-extensions:
     - MagicHash
-    - TemplateHaskell

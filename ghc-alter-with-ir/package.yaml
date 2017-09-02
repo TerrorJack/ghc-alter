@@ -17,7 +17,9 @@ ghc-options: -Wall
 
 dependencies:
   - base
+  - containers
   - ghc
+  - ghc-alter-buildinfo
 
 library:
   source-dirs: src

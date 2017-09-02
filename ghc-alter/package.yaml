@@ -38,12 +38,6 @@ dependencies:
   - template-haskell
   - pretty-show
 
-custom-setup:
-  dependencies:
-    - base
-    - Cabal
-    - ghc-alter-buildinfo
-
 library:
   source-dirs: src
   other-extensions:

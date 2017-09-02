@@ -15,6 +15,12 @@ extra-source-files:
 
 ghc-options: -Wall
 
+custom-setup:
+  dependencies:
+    - base
+    - binary
+    - Cabal
+
 dependencies:
   - base
   - binary

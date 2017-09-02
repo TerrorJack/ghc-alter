@@ -6,7 +6,7 @@ module Language.Haskell.GHC.Alter.BuildInfo
   , datadir
   , ghc
   , ghcPkg
-  , ghcLibdir
+  , ghcLibDir
   , pkgDbStack
   , pkgName
   ) where
@@ -19,25 +19,33 @@ import qualified Distribution.Types.PackageName as Cabal
 import Language.Haskell.GHC.Alter.BuildInfo.TypedSplices
 
 bindir :: FilePath
+{-# NOINLINE bindir #-}
 bindir = $$(bindirQ)
 
 libdir :: FilePath
+{-# NOINLINE libdir #-}
 libdir = $$(libdirQ)
 
 datadir :: FilePath
+{-# NOINLINE datadir #-}
 datadir = $$(datadirQ)
 
 ghc :: FilePath
+{-# NOINLINE ghc #-}
 ghc = Cabal.programPath $$(ghcQ)
 
 ghcPkg :: FilePath
+{-# NOINLINE ghcPkg #-}
 ghcPkg = Cabal.programPath $$(ghcPkgQ)
 
-ghcLibdir :: FilePath
-ghcLibdir = $$(ghcLibDirQ)
+ghcLibDir :: FilePath
+{-# NOINLINE ghcLibDir #-}
+ghcLibDir = $$(ghcLibDirQ)
 
 pkgDbStack :: Cabal.PackageDBStack
+{-# NOINLINE pkgDbStack #-}
 pkgDbStack = $$(packageDbStackQ)
 
 pkgName :: String
+{-# NOINLINE pkgName #-}
 pkgName = Cabal.unPackageName $ Cabal.pkgName $ Cabal.package $$(packageDescriptionQ)

@@ -11,7 +11,7 @@ import GHC
 import GHC.Exts
 import GHC.IO (evaluate)
 import GHCi
-import Language.Haskell.GHC.Alter.Eval.Internals
+import Language.Haskell.GHC.Alter.BuildInfo
 import Linker
 
 unsafeImport :: [PackageDBFlag] -> [PackageFlag] -> ModuleName -> String -> IO a
