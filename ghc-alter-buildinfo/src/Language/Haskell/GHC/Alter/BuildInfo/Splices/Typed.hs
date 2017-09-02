@@ -1,10 +1,21 @@
 {-# LANGUAGE TemplateHaskell #-}
 
-module Language.Haskell.GHC.Alter.BuildInfo.TypedSplices
+module Language.Haskell.GHC.Alter.BuildInfo.Splices.Typed
   ( buildInfoQ
+  , installDirsQ
+  , prefixQ
   , bindirQ
   , libdirQ
+  , dynlibdirQ
+  , flibdirQ
+  , libexecdirQ
+  , includedirQ
   , datadirQ
+  , docdirQ
+  , mandirQ
+  , htmldirQ
+  , haddockdirQ
+  , sysconfdirQ
   , packageDescriptionQ
   , configuredProgramQ
   , ghcQ
@@ -53,25 +64,49 @@ buildInfoQ = do
   bi <- buildInfo
   liftTyped bi [t|(Args, ConfigFlags, PackageDescription, LocalBuildInfo)|]
 
-installDirsQ :: Q (InstallDirs FilePath)
-installDirsQ = do
+installDirsQ :: (InstallDirs FilePath -> FilePath) -> Q (TExp FilePath)
+installDirsQ field = do
   (_, _, pkg_descr, lbi) <- buildInfo
-  pure $ absoluteInstallDirs pkg_descr lbi NoCopyDest
+  liftTyped (field $ absoluteInstallDirs pkg_descr lbi NoCopyDest) [t|FilePath|]
+
+prefixQ :: Q (TExp FilePath)
+prefixQ = installDirsQ prefix
 
 bindirQ :: Q (TExp FilePath)
-bindirQ = do
-  dirs <- installDirsQ
-  liftTyped (bindir dirs) [t|FilePath|]
+bindirQ = installDirsQ bindir
 
 libdirQ :: Q (TExp FilePath)
-libdirQ = do
-  dirs <- installDirsQ
-  liftTyped (libdir dirs) [t|FilePath|]
+libdirQ = installDirsQ libdir
+
+dynlibdirQ :: Q (TExp FilePath)
+dynlibdirQ = installDirsQ dynlibdir
+
+flibdirQ :: Q (TExp FilePath)
+flibdirQ = installDirsQ flibdir
+
+libexecdirQ :: Q (TExp FilePath)
+libexecdirQ = installDirsQ libexecdir
+
+includedirQ :: Q (TExp FilePath)
+includedirQ = installDirsQ includedir
 
 datadirQ :: Q (TExp FilePath)
-datadirQ = do
-  dirs <- installDirsQ
-  liftTyped (datadir dirs) [t|FilePath|]
+datadirQ = installDirsQ datadir
+
+docdirQ :: Q (TExp FilePath)
+docdirQ = installDirsQ docdir
+
+mandirQ :: Q (TExp FilePath)
+mandirQ = installDirsQ mandir
+
+htmldirQ :: Q (TExp FilePath)
+htmldirQ = installDirsQ htmldir
+
+haddockdirQ :: Q (TExp FilePath)
+haddockdirQ = installDirsQ haddockdir
+
+sysconfdirQ :: Q (TExp FilePath)
+sysconfdirQ = installDirsQ sysconfdir
 
 packageDescriptionQ :: Q (TExp PackageDescription)
 packageDescriptionQ = do

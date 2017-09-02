@@ -1,4 +1,5 @@
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module Language.Haskell.GHC.Alter.Boot
   ( BootTask(..)
@@ -9,6 +10,8 @@ module Language.Haskell.GHC.Alter.Boot
 
 import Control.Monad
 import qualified Language.Haskell.GHC.Alter.BuildInfo as P
+import qualified
+       Language.Haskell.GHC.Alter.BuildInfo.Splices.Untyped as P
 import System.Directory
 import System.Environment
 import System.FilePath
@@ -22,9 +25,9 @@ data BootTask = BootTask
 defaultBootTask :: BootTask
 defaultBootTask =
   BootTask
-  { bootlibdir = P.datadir </> "boot-lib"
-  , topdir = P.datadir </> ".boot"
-  , pkgDb = P.datadir </> ".boot" </> "package.conf.d"
+  { bootlibdir = $(P.datadirQ) </> "boot-lib"
+  , topdir = $(P.datadirQ) </> ".boot"
+  , pkgDb = $(P.datadirQ) </> ".boot" </> "package.conf.d"
   , ghc = P.ghc
   , ghcPkg = P.ghcPkg
   , ghcOpts = []
