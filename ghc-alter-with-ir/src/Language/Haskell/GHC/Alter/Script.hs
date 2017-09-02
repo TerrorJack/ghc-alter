@@ -13,8 +13,13 @@ import GHC.Conc
 import Language.Haskell.GHC.Alter.BuildInfo
 import Language.Haskell.GHC.Alter.Compiler
 
-compile :: [FilePath] -> [ModuleName] -> IO (Map.Map ModuleName IR)
-compile import_paths mod_names = do
+compile ::
+     [PackageDBFlag]
+  -> [PackageFlag]
+  -> [FilePath]
+  -> [ModuleName]
+  -> IO (Map.Map ModuleName IR)
+compile pkgdbs pkgs import_paths mod_names = do
   ir_map_ref <- newTVarIO Map.empty
   hooks <-
     toHooks $
@@ -31,7 +36,12 @@ compile import_paths mod_names = do
       void $
         setSessionDynFlags $
         Opt_ForceRecomp `setGeneralFlag'`
-        dflags {importPaths = import_paths, hooks = hooks}
+        dflags
+        { importPaths = import_paths
+        , hooks = hooks
+        , packageDBFlags = pkgdbs
+        , packageFlags = pkgs
+        }
       setTargets [Target (TargetModule m) True Nothing | m <- mod_names]
       sf <- load LoadAllTargets
       case sf of
