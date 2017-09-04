@@ -1,9 +1,11 @@
-resolver: nightly-2017-09-01
+resolver: ghc-8.3.20170902
+system-ghc: true
+skip-ghc-check: true
+ghc-build: standard
 packages:
   - ghc-alter
   - ghc-alter-buildinfo
   - ghc-alter-eval
   - ghc-alter-frontend
-  - ghc-alter-orphans
   - ghc-alter-store
   - ghc-alter-with-ir

@@ -17,22 +17,16 @@ matrix:
         apt:
           sources:
             - git-core
+            - hvr-ghc
             - ubuntu-toolchain-r-test
-
-    - os: osx
-      osx_image: xcode9
+          packages:
+            - ghc-head
+            - ghc-head-htmldocs
 
 before_install:
   - mkdir -p ~/.local/bin
-  - export PATH=~/.local/bin:$PATH
-  - |
-    if [ `uname` = "Darwin" ]
-    then
-      brew install xz
-      travis_retry curl -L https://www.stackage.org/stack/osx-x86_64 | tar xz --strip-components=1 --include '*/stack' -C ~/.local/bin
-    else
-      travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
-    fi
+  - export PATH=~/.local/bin:/opt/ghc/head/bin:$PATH
+  - travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
 
 install:
   - cd ghc-alter/boot-lib/integer-gmp
@@ -40,18 +34,13 @@ install:
   - cd ../base
   - autoreconf -i
   - cd $TRAVIS_BUILD_DIR
-  - stack --no-terminal setup
-  - curl -L https://github.com/TerrorJack/ghc-doc/archive/gh-pages.zip -o ghc-doc.zip
-  - unzip -q ghc-doc.zip
-  - mv ghc-doc-gh-pages html
-  - cp -r html `stack path --programs`/ghc-8.2.1/share/doc/ghc-8.2.1/
   - stack --no-terminal build --test --no-run-tests --haddock --haddock-deps
   - stack --no-terminal test ghc-alter:compile-fact
   - stack --no-terminal test ghc-alter:ghc-alter-boot
 
 script:
   - |
-    if [ `uname` = "Linux" ] && [ $TRAVIS_REPO_SLUG == "TerrorJack/ghc-alter" ]
+    if [ $TRAVIS_REPO_SLUG == "TerrorJack/ghc-alter" ]
     then
       cd `stack path --local-doc-root`
       touch .nojekyll

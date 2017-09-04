@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/TerrorJack/ghc-alter.svg)](https://travis-ci.org/TerrorJack/ghc-alter)
 
-`ghc-alter` is a set of libraries to ease the development of custom Haskell compilers on top of ghc. Currently contains:
+`ghc-alter` is a set of packages to ease the development of custom Haskell compilers on top of ghc. Currently contains:
 
 * [`ghc-alter-eval`](ghc-alter-eval): Import values at runtime.
 * [`ghc-alter-buildinfo`](ghc-alter-buildinfo): Obtain build info of current package.
@@ -11,7 +11,7 @@
 * [`ghc-alter-store`](ghc-alter-store): A simple object file store. Useful for compiling Haskell sources to custom object formats.
 * [`ghc-alter-with-ir`](ghc-alter-with-ir): Extract IRs from ghc pipeline for custom compilation, with support for patching parsed modules.
 
-ghc 8.2.1 is required.
+Requires ghc-head. For packages other than `ghc-alter-orphans`, ghc-8.2.1 may work as well.
 
 ## Documentation
 

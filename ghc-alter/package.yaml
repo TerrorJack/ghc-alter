@@ -36,13 +36,10 @@ dependencies:
   - filepath
   - ghc
   - ghc-alter-buildinfo
-  - ghc-alter-orphans
   - ghc-alter-store
   - ghc-alter-with-ir
-  - hoopl
   - process
   - template-haskell
-  - pretty-show
 
 library:
   source-dirs: src
