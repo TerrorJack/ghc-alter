@@ -7,5 +7,6 @@ packages:
   - ghc-alter-buildinfo
   - ghc-alter-eval
   - ghc-alter-frontend
+  - ghc-alter-orphans
   - ghc-alter-store
   - ghc-alter-with-ir
