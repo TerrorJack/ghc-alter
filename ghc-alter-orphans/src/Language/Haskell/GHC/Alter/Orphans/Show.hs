@@ -10,10 +10,13 @@ import CoAxiom
 import CoreSyn
 import CostCentre
 import DataCon
+import ForeignCall
 import Literal
 import Module
 import Name
 import Outputable
+import PrimOp
+import StgSyn
 import Text.Show.Functions ()
 import TyCoRep
 import TyCon
@@ -94,3 +97,52 @@ deriving instance Show AltCon
 deriving instance Show b => Show (Expr b)
 
 deriving instance Show b => Show (Bind b)
+
+deriving instance Show occ => Show (GenStgArg occ)
+
+deriving instance Show PrimOpVecCat
+
+deriving instance Show PrimOp
+
+deriving instance Show PrimCall
+
+deriving instance Show CCallTarget
+
+deriving instance Show CCallConv
+
+deriving instance Show CCallSpec
+
+deriving instance Show ForeignCall
+
+deriving instance Show StgOp
+
+deriving instance Show AltType
+
+deriving instance
+         (Show bndr, Show occ) => Show (GenStgExpr bndr occ)
+
+instance Show CostCentreStack where
+  show ccs =
+    case maybeSingletonCCS ccs of
+      Just cc -> "SingletonCCS (" ++ show cc ++ ")"
+      _
+        | noCCSAttached ccs -> "NoCCS"
+        | isCurrentCCS ccs -> "CurrentCCS"
+        | otherwise -> "DontCareCCS"
+
+instance Show StgBinderInfo where
+  show sbi =
+    if satCallsOnly sbi
+      then "SatCallsOnly"
+      else "NoStgBinderInfo"
+
+deriving instance Show UpdateFlag
+
+deriving instance
+         (Show bndr, Show occ) => Show (GenStgRhs bndr occ)
+
+deriving instance
+         (Show bndr, Show occ) => Show (GenStgBinding bndr occ)
+
+deriving instance
+         (Show bndr, Show occ) => Show (GenStgTopBinding bndr occ)
