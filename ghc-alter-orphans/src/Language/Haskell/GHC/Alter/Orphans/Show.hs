@@ -7,29 +7,40 @@ module Language.Haskell.GHC.Alter.Orphans.Show
   (
   ) where
 
+import Annotations
+import Avail
 import BasicTypes
 import ByteCodeTypes
 import CLabel
+import Class
 import Cmm
 import CoAxiom
 import CoreSyn
 import CostCentre
 import DataCon
+import FamInstEnv
 import ForeignCall
+import GHC.Serialized
 import GHCi.RemoteTypes
 import Hoopl.Block
 import Hoopl.Graph
 import HscTypes
+import InstEnv
 import Literal
 import Module
 import Name
 import Outputable
+import PatSyn
 import PrimOp
 import SMRep
+import SrcLoc
 import StgSyn
 import Text.Show.Functions ()
 import TyCoRep
 import TyCon
+import UniqDFM
+import UniqFM
+import UniqSet
 import Var
 
 stubShow :: Outputable a => String -> a -> String
@@ -45,6 +56,76 @@ namedThingString a =
 
 stubShowNamedThing :: NamedThing a => String -> a -> String
 stubShowNamedThing n x = "(" ++ n ++ " " ++ show (namedThingString x) ++ ")"
+
+instance Outputable a => Show (OccEnv a) where
+  show = stubShow "OccEnv"
+
+instance Show a => Show (UniqFM a) where
+  show = show . nonDetUFMToList
+
+instance Outputable a => Show (UniqDFM a) where
+  show = stubShow "UniqDFM"
+
+deriving instance Show a => Show (FieldLbl a)
+
+deriving instance Show AvailInfo
+
+deriving instance Show Dependencies
+
+deriving instance Show Usage
+
+deriving instance Show FixityDirection
+
+deriving instance Show Fixity
+
+deriving instance Show FixItem
+
+instance Show Class where
+  show = stubShow "Class"
+
+deriving instance Show OverlapMode
+
+deriving instance Show OverlapFlag
+
+deriving instance Show IsOrphan
+
+deriving instance Show ClsInst
+
+deriving instance Show FamFlavor
+
+deriving instance Show FamInst
+
+instance Show PatSyn where
+  show = stubShow "PatSyn"
+
+deriving instance Show Activation
+
+deriving instance Show CoreRule
+
+deriving instance (Show l, Show e) => Show (GenLocated l e)
+
+deriving instance Show StringLiteral
+
+deriving instance Show WarningTxt
+
+deriving instance Show Warnings
+
+deriving instance Show name => Show (AnnTarget name)
+
+deriving instance Show Serialized
+
+deriving instance Show Annotation
+
+deriving instance Show CompleteMatch
+
+deriving instance Show CoreVect
+
+instance Show a => Show (UniqSet a) where
+  show = show . nonDetEltsUniqSet
+
+deriving instance Show VectInfo
+
+deriving instance Show ModGuts
 
 instance Show SDoc where
   show d = "(SDoc " ++ show (showSDocUnsafe d) ++ ")"

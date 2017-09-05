@@ -18,6 +18,8 @@ ghc-options: -Wall
 dependencies:
   - base
   - ghc
+  - ghc-boot
+  - ghci
 
 library:
   source-dirs: src
