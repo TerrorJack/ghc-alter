@@ -1,4 +1,6 @@
+{-# LANGUAGE GADTs #-}
 {-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
 module Language.Haskell.GHC.Alter.Orphans.Show
@@ -6,16 +8,21 @@ module Language.Haskell.GHC.Alter.Orphans.Show
   ) where
 
 import BasicTypes
+import CLabel
+import Cmm
 import CoAxiom
 import CoreSyn
 import CostCentre
 import DataCon
 import ForeignCall
+import Hoopl.Block
+import Hoopl.Graph
 import Literal
 import Module
 import Name
 import Outputable
 import PrimOp
+import SMRep
 import StgSyn
 import Text.Show.Functions ()
 import TyCoRep
@@ -146,3 +153,73 @@ deriving instance
 
 deriving instance
          (Show bndr, Show occ) => Show (GenStgTopBinding bndr occ)
+
+instance Show CLabel where
+  show = stubShow "CLabel"
+
+deriving instance Show Section
+
+deriving instance
+         (Show d, Show h, Show g) => Show (GenCmmDecl d h g)
+
+deriving instance Show CmmLit
+
+deriving instance Show CmmStatic
+
+deriving instance Show CmmStatics
+
+deriving instance Show ArgDescr
+
+deriving instance Show ClosureTypeInfo
+
+deriving instance Show SMRep
+
+deriving instance Show ProfilingInfo
+
+instance Show StgHalfWord where
+  show shw = "StgHalfWord " ++ show (fromStgHalfWord shw)
+
+deriving instance Show C_SRT
+
+deriving instance Show CmmInfoTable
+
+deriving instance Show CmmStackInfo
+
+deriving instance Show CmmTopInfo
+
+deriving instance Show t => Show (MaybeO ex t)
+
+deriving instance
+         (Show (block n C C), Show (block n O C), Show (block n C O),
+          Show (block n O O)) =>
+         Show (Graph' block n e x)
+
+deriving instance
+         (Show (n C O), Show (n O C), Show (n O O), Show (n C O)) =>
+         Show (Block n e x)
+
+deriving instance
+         (Show (n C O), Show (n O C), Show (n O O)) => Show (GenCmmGraph n)
+
+deriving instance Show CmmTickScope
+
+instance Show CmmType where
+  show = stubShow "CmmType"
+
+deriving instance Show LocalReg
+
+deriving instance Show CmmReg
+
+deriving instance Show Area
+
+deriving instance Show CmmExpr
+
+deriving instance Show ForeignHint
+
+deriving instance Show CmmReturnInfo
+
+deriving instance Show ForeignConvention
+
+deriving instance Show ForeignTarget
+
+deriving instance Show (CmmNode e x)
