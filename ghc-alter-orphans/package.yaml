@@ -22,4 +22,6 @@ dependencies:
 library:
   source-dirs: src
   other-extensions:
+    - GADTs
     - StandaloneDeriving
+    - UndecidableInstances

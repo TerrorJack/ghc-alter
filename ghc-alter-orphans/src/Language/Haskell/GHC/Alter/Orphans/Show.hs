@@ -8,6 +8,7 @@ module Language.Haskell.GHC.Alter.Orphans.Show
   ) where
 
 import BasicTypes
+import ByteCodeTypes
 import CLabel
 import Cmm
 import CoAxiom
@@ -15,8 +16,10 @@ import CoreSyn
 import CostCentre
 import DataCon
 import ForeignCall
+import GHCi.RemoteTypes
 import Hoopl.Block
 import Hoopl.Graph
+import HscTypes
 import Literal
 import Module
 import Name
@@ -42,6 +45,37 @@ namedThingString a =
 
 stubShowNamedThing :: NamedThing a => String -> a -> String
 stubShowNamedThing n x = "(" ++ n ++ " " ++ show (namedThingString x) ++ ")"
+
+instance Show SDoc where
+  show d = "(SDoc " ++ show (showSDocUnsafe d) ++ ")"
+
+deriving instance Show ForeignStubs
+
+deriving instance Show InstalledUnitId
+
+deriving instance Show HpcInfo
+
+instance Show (ForeignRef a) where
+  show _ = "ForeignRef"
+
+instance Show NameSpace where
+  show ns
+    | isDataConNameSpace ns = "DataName"
+    | isTcClsNameSpace ns = "TcClsName"
+    | isTvNameSpace ns = "TvName"
+    | otherwise = "VarName"
+
+instance Show OccName where
+  show n =
+    "(OccName " ++ show (occNameSpace n) ++ " " ++ show (occNameString n) ++ ")"
+
+deriving instance Show CgBreakInfo
+
+deriving instance Show ModBreaks
+
+deriving instance Show SptEntry
+
+deriving instance Show CgGuts
 
 instance Show ModuleName where
   show = show . moduleNameString
@@ -131,7 +165,7 @@ deriving instance
 instance Show CostCentreStack where
   show ccs =
     case maybeSingletonCCS ccs of
-      Just cc -> "SingletonCCS (" ++ show cc ++ ")"
+      Just cc -> "(SingletonCCS (" ++ show cc ++ "))"
       _
         | noCCSAttached ccs -> "NoCCS"
         | isCurrentCCS ccs -> "CurrentCCS"
@@ -177,7 +211,7 @@ deriving instance Show SMRep
 deriving instance Show ProfilingInfo
 
 instance Show StgHalfWord where
-  show shw = "StgHalfWord " ++ show (fromStgHalfWord shw)
+  show shw = "(StgHalfWord " ++ show (fromStgHalfWord shw) ++ ")"
 
 deriving instance Show C_SRT
 
