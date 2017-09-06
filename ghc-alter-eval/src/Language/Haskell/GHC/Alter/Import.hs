@@ -1,6 +1,6 @@
 {-# LANGUAGE MagicHash #-}
 
-module Language.Haskell.GHC.Alter.Eval
+module Language.Haskell.GHC.Alter.Import
   ( unsafeImport
   ) where
 
