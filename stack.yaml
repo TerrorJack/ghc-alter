@@ -9,4 +9,5 @@ packages:
   - ghc-alter-frontend
   - ghc-alter-orphans
   - ghc-alter-store
+  - ghc-alter-unexported
   - ghc-alter-with-ir

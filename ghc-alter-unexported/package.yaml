@@ -1,7 +1,7 @@
-name: ghc-alter-with-ir
+name: ghc-alter-unexported
 version: 0.0.1
 category: Compiler
-synopsis: Extract IRs from ghc pipeline.
+synopsis: Unexported functions from ghc.
 stability: alpha
 maintainer: Shao Cheng <astrohavoc@gmail.com>
 copyright: (c) 2017 Shao Cheng
@@ -13,18 +13,13 @@ extra-source-files:
   - README.md
   - CHANGELOG.md
 
-ghc-options: -Wall
-
 dependencies:
+  - array
   - base
+  - bytestring
   - containers
   - ghc
-  - ghc-alter-buildinfo
-  - ghc-alter-unexported
   - ghci
 
 library:
   source-dirs: src
-  other-extensions:
-    - NamedFieldPuns
-    - RecordWildCards

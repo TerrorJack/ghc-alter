@@ -36,7 +36,6 @@ dependencies:
   - filepath
   - ghc
   - ghc-alter-buildinfo
-  - ghc-alter-store
   - ghc-alter-with-ir
   - process
   - template-haskell

@@ -9,9 +9,10 @@
 * [`ghc-alter-frontend`](ghc-alter-frontend): Utils for building ghc frontend plugins.
 * [`ghc-alter-orphans`](ghc-alter-orphans): Orphan `Show` instances for various ghc IR types. Useful for debugging & studying ghc internals.
 * [`ghc-alter-store`](ghc-alter-store): A simple object file store. Useful for compiling Haskell sources to custom object formats.
+* [`ghc-alter-unexported`](ghc-alter-unexported): Unexported functions from ghc.
 * [`ghc-alter-with-ir`](ghc-alter-with-ir): Extract IRs from ghc pipeline for custom compilation, with support for patching parsed modules.
 
-Requires ghc-head. For packages other than `ghc-alter-orphans`, ghc-8.2.1 may work as well.
+Requires ghc-head. For packages other than `ghc-alter-orphans` & `ghc-alter-unexported`, ghc-8.2.1 may work as well.
 
 ## Documentation
 
