@@ -13,6 +13,8 @@ extra-source-files:
   - README.md
   - CHANGELOG.md
 
+ghc-options: -Wno-name-shadowing
+
 dependencies:
   - array
   - base

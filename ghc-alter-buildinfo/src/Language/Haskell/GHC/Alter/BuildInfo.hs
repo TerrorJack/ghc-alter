@@ -9,20 +9,20 @@ module Language.Haskell.GHC.Alter.BuildInfo
 
 import qualified Distribution.Simple.Compiler as Cabal
 import qualified Distribution.Simple.Program as Cabal
-import Language.Haskell.GHC.Alter.BuildInfo.Splices.Typed
+import Language.Haskell.GHC.Alter.BuildInfo.Splices.Untyped
 
 ghc :: FilePath
 {-# NOINLINE ghc #-}
-ghc = Cabal.programPath $$(ghcQ)
+ghc = Cabal.programPath $(ghcQ)
 
 ghcPkg :: FilePath
 {-# NOINLINE ghcPkg #-}
-ghcPkg = Cabal.programPath $$(ghcPkgQ)
+ghcPkg = Cabal.programPath $(ghcPkgQ)
 
 ghcLibDir :: FilePath
 {-# NOINLINE ghcLibDir #-}
-ghcLibDir = $$(ghcLibDirQ)
+ghcLibDir = $(ghcLibDirQ)
 
 pkgDbStack :: Cabal.PackageDBStack
 {-# NOINLINE pkgDbStack #-}
-pkgDbStack = $$(packageDbStackQ)
+pkgDbStack = $(packageDbStackQ)
