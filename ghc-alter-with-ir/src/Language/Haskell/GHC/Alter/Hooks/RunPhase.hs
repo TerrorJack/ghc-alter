@@ -37,9 +37,8 @@ import UniqSupply
 data RunPhase = RunPhase
   { onenter, onleave :: PhasePlus -> FilePath -> DynFlags -> IO ()
   , core :: ModSummary -> CgGuts -> IO ()
-  , corePrep :: ModSummary -> CoreProgram -> IO ()
-  , stgFromCore, stg :: ModSummary -> [StgTopBinding] -> IO ()
-  , cmmFromStg, cmm :: ModSummary -> Stream.Stream IO CmmGroup () -> IO ()
+  , stg :: ModSummary -> [StgTopBinding] -> IO ()
+  , cmm :: ModSummary -> Stream.Stream IO CmmGroup () -> IO ()
   , cmmRaw :: ModSummary -> Stream.Stream IO RawCmmGroup () -> IO ()
   }
 
@@ -49,10 +48,7 @@ defaultRunPhase =
   { onenter = three
   , onleave = three
   , core = two
-  , corePrep = two
-  , stgFromCore = two
   , stg = two
-  , cmmFromStg = two
   , cmm = two
   , cmmRaw = two
   }
@@ -69,7 +65,6 @@ myCoreToStgWith ::
   -> IO ([StgTopBinding], CollectedCCs)
 myCoreToStgWith RunPhase {..} mod_summary dflags this_mod prepd_binds = do
   let stg_binds = coreToStg dflags this_mod prepd_binds
-  stgFromCore mod_summary stg_binds
   (stg_binds2, cost_centre_info) <- stg2stg dflags this_mod stg_binds
   stg mod_summary stg_binds2
   return (stg_binds2, cost_centre_info)
@@ -95,7 +90,6 @@ doCodeGenWith RunPhase {..} mod_summary hsc_env this_mod data_tycons cost_centre
           cost_centre_info
           stg_binds
           hpc_info
-  cmmFromStg mod_summary cmm_stream
   let dump1 a = do
         dumpIfSet_dyn
           dflags
@@ -150,7 +144,6 @@ hscGenHardCodeWith rp@RunPhase {..} hsc_env cgguts mod_summary output_filename =
       location = ms_location mod_summary
       data_tycons = filter isDataTyCon tycons
   prepd_binds <- corePrepPgm hsc_env this_mod location core_binds data_tycons
-  liftIO $ corePrep mod_summary prepd_binds
   (stg_binds, cost_centre_info) <-
     myCoreToStgWith rp mod_summary dflags this_mod prepd_binds
   let prof_init = profilingInitCode this_mod cost_centre_info

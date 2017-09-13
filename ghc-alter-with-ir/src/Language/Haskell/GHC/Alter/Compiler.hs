@@ -9,7 +9,6 @@ module Language.Haskell.GHC.Alter.Compiler
 
 import Cmm
 import Control.Monad
-import CoreSyn
 import DriverPipeline
 import GHC.Conc
 import Hooks
@@ -25,19 +24,18 @@ data IR = IR
   { parsed :: HsParsedModule
   , tc :: TcGblEnv
   , core :: CgGuts
-  , corePrep :: CoreProgram
-  , stgFromCore, stg :: [StgTopBinding]
-  , cmmFromStg, cmm :: [CmmGroup]
+  , stg :: [StgTopBinding]
+  , cmm :: [CmmGroup]
   , cmmRaw :: [RawCmmGroup]
   }
 
 data Compiler = Compiler
   { patch :: ModSummary -> HsParsedModule -> IO HsParsedModule
-  , runCompiler :: ModSummary -> IR -> IO ()
+  , withIR :: ModSummary -> IR -> IO ()
   }
 
 defaultCompiler :: Compiler
-defaultCompiler = Compiler {patch = const pure, runCompiler = \_ _ -> pure ()}
+defaultCompiler = Compiler {patch = const pure, withIR = \_ _ -> pure ()}
 
 modifyTVar' :: TVar a -> (a -> a) -> STM ()
 modifyTVar' var f = do
@@ -50,10 +48,7 @@ toHooks Compiler {..} = do
   parsed_map_ref <- newTVarIO emptyModuleEnv
   tc_map_ref <- newTVarIO emptyModuleEnv
   core_map_ref <- newTVarIO emptyModuleEnv
-  corePrep_map_ref <- newTVarIO emptyModuleEnv
-  stgFromCore_map_ref <- newTVarIO emptyModuleEnv
   stg_map_ref <- newTVarIO emptyModuleEnv
-  cmmFromStg_map_ref <- newTVarIO emptyModuleEnv
   cmm_map_ref <- newTVarIO emptyModuleEnv
   cmmRaw_map_ref <- newTVarIO emptyModuleEnv
   pure
@@ -85,30 +80,21 @@ toHooks Compiler {..} = do
                              IR <$> read_map parsed_map_ref <*>
                              read_map tc_map_ref <*>
                              read_map core_map_ref <*>
-                             read_map corePrep_map_ref <*>
-                             read_map stgFromCore_map_ref <*>
                              read_map stg_map_ref <*>
-                             read_map cmmFromStg_map_ref <*>
                              read_map cmm_map_ref <*>
                              read_map cmmRaw_map_ref
                            pure $ do
-                             runCompiler mod_summary ir
+                             withIR mod_summary ir
                              atomically $ do
                                del_map parsed_map_ref
                                del_map tc_map_ref
                                del_map core_map_ref
-                               del_map corePrep_map_ref
-                               del_map stgFromCore_map_ref
                                del_map stg_map_ref
-                               del_map cmmFromStg_map_ref
                                del_map cmm_map_ref
                                del_map cmmRaw_map_ref
                 _ -> pure ()
         , RP.core = write_map core_map_ref
-        , RP.corePrep = write_map corePrep_map_ref
-        , RP.stgFromCore = write_map stgFromCore_map_ref
         , RP.stg = write_map stg_map_ref
-        , RP.cmmFromStg = write_map_stream cmmFromStg_map_ref
         , RP.cmm = write_map_stream cmm_map_ref
         , RP.cmmRaw = write_map_stream cmmRaw_map_ref
         }

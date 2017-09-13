@@ -25,7 +25,7 @@ compile pkgdbs pkgs import_paths mods = do
   hooks <-
     toHooks $
     defaultCompiler
-    { runCompiler =
+    { withIR =
         \ModSummary {..} ir ->
           atomicModifyIORef' ir_map_ref $ \ir_map ->
             (Map.insert (moduleName ms_mod) ir ir_map, ())
